@@ -174,6 +174,18 @@
     border: 0.5px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
   }
+
+  .cta-sky-bg {
+    background: linear-gradient(-45deg, #0077cc, #00a3ff, #38bdf8, #0ea5e9, #0284c7);
+    background-size: 400% 400%;
+    animation: ctaSkyShift 12s ease infinite;
+  }
+
+  @keyframes ctaSkyShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
 }
 
 @layer components {

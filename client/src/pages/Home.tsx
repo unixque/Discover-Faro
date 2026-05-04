@@ -42,6 +42,95 @@ const useScrollAnimation = () => {
   return { ref, isVisible };
 };
 
+const BUBBLE_SIZE = 64;
+const BUBBLES = [
+  { name: "Jake", letter: "J", color: "from-blue-400 to-blue-600" },
+  { name: "Sarah", letter: "S", color: "from-emerald-400 to-teal-600" },
+  { name: "Lara", letter: "L", color: "from-amber-400 to-orange-500" },
+];
+
+function BouncingBubblesBox({ isVisible }: { isVisible: boolean }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const bubblesRef = useRef(
+    BUBBLES.map((_, i) => ({
+      x: 60 + i * 100,
+      y: 80 + i * 60,
+      vx: (1.2 + i * 0.3) * (i % 2 === 0 ? 1 : -1),
+      vy: (1.0 + i * 0.4) * (i % 2 === 0 ? -1 : 1),
+    }))
+  );
+  const [positions, setPositions] = useState(
+    bubblesRef.current.map((b) => ({ x: b.x, y: b.y }))
+  );
+  const animRef = useRef<number>(0);
+
+  useEffect(() => {
+    const animate = () => {
+      const container = containerRef.current;
+      if (!container) {
+        animRef.current = requestAnimationFrame(animate);
+        return;
+      }
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+
+      bubblesRef.current.forEach((b) => {
+        b.x += b.vx;
+        b.y += b.vy;
+
+        if (b.x <= 0) { b.x = 0; b.vx = Math.abs(b.vx); }
+        if (b.x >= w - BUBBLE_SIZE) { b.x = w - BUBBLE_SIZE; b.vx = -Math.abs(b.vx); }
+        if (b.y <= 0) { b.y = 0; b.vy = Math.abs(b.vy); }
+        if (b.y >= h - BUBBLE_SIZE) { b.y = h - BUBBLE_SIZE; b.vy = -Math.abs(b.vy); }
+      });
+
+      setPositions(bubblesRef.current.map((b) => ({ x: b.x, y: b.y })));
+      animRef.current = requestAnimationFrame(animate);
+    };
+
+    animRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animRef.current);
+  }, []);
+
+  return (
+    <motion.div
+      ref={containerRef}
+      className="relative h-96 rounded-3xl overflow-hidden border border-blue-100 shadow-lg"
+      style={{
+        backgroundImage: "url('/maps/faro_map.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+      initial={{ opacity: 0, x: 30 }}
+      animate={isVisible ? { opacity: 1, x: 0 } : { opacity: 0, x: 30 }}
+      transition={{ duration: 0.8 }}
+    >
+      {/* Subtle overlay so bubbles pop against the map */}
+      <div className="absolute inset-0 bg-white/20 backdrop-blur-[1px]" />
+
+      {BUBBLES.map((bubble, i) => (
+        <div
+          key={bubble.name}
+          className={`absolute w-16 h-16 rounded-full bg-gradient-to-br ${bubble.color} flex items-center justify-center text-white font-bold text-lg shadow-xl border-2 border-white/50 z-10`}
+          style={{
+            transform: `translate(${positions[i].x}px, ${positions[i].y}px)`,
+            willChange: "transform",
+          }}
+        >
+          {bubble.letter}
+        </div>
+      ))}
+
+      {/* Label */}
+      <div className="absolute bottom-4 left-0 right-0 text-center z-10">
+        <span className="bg-white/80 backdrop-blur-sm text-gray-800 font-semibold text-sm px-4 py-2 rounded-full shadow-md">
+          Collaborating on Faro adventure
+        </span>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function Home() {
   const [activeStep, setActiveStep] = useState(0);
   const heroRef = useScrollAnimation();
@@ -50,34 +139,30 @@ export default function Home() {
   const communityRef = useScrollAnimation();
   const ctaRef = useScrollAnimation();
 
-  // Navbar hide animation: visible → contracting → hidden
-  const [navState, setNavState] = useState<'visible' | 'contracting' | 'hidden'>('visible');
-  const navStateRef = useRef(navState);
-  const navTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    navStateRef.current = navState;
-  }, [navState]);
+  // Navbar expand animation: starts contracted, expands after scrolling past hero
+  const [navExpanded, setNavExpanded] = useState(false);
+  const [navFullyExpanded, setNavFullyExpanded] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      const pastHero = window.scrollY > window.innerHeight * 0.7;
-
-      if (pastHero && navStateRef.current === 'visible') {
-        setNavState('contracting');
-        navTimeoutRef.current = setTimeout(() => setNavState('hidden'), 500);
-      } else if (!pastHero && navStateRef.current !== 'visible') {
-        if (navTimeoutRef.current) clearTimeout(navTimeoutRef.current);
-        setNavState('visible');
-      }
+      const pastHero = window.scrollY > window.innerHeight * 0.65;
+      setNavExpanded(pastHero);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (navTimeoutRef.current) clearTimeout(navTimeoutRef.current);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Delay showing nav links until after the expand animation finishes
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    if (navExpanded) {
+      timer = setTimeout(() => setNavFullyExpanded(true), 350);
+    } else {
+      setNavFullyExpanded(false);
+    }
+    return () => clearTimeout(timer);
+  }, [navExpanded]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -101,74 +186,63 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-sky-50 to-blue-50">
-      {/* Navigation Bar — Floating, Translucent, Detached */}
-      <motion.div
-        className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 pt-4"
-        animate={{
-          y: navState === 'hidden' ? -100 : 0,
-          opacity: navState === 'hidden' ? 0 : 1,
-        }}
-        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      >
+      {/* Navigation Bar — Floating, Compact → Expanded on Scroll */}
+      <div className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 pt-4 pointer-events-none">
         <nav
-          className={`mx-auto glass-bg rounded-2xl transition-all duration-500 ease-in-out overflow-hidden ${
-            navState !== 'visible' ? 'max-w-[76px]' : 'max-w-5xl'
-          }`}
+          className={`mx-auto glass-bg rounded-[28px] overflow-hidden pointer-events-auto transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${navExpanded ? 'max-w-5xl' : 'max-w-[220px]'
+            }`}
         >
           <div
-            className={`flex items-center relative transition-all duration-500 ${
-              navState !== 'visible' ? 'justify-center px-4 py-2' : 'justify-between px-6 py-3'
-            }`}
+            className={`flex flex-nowrap items-center relative transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${navExpanded ? 'justify-between px-5 py-2.5' : 'justify-center px-3 py-2.5'
+              }`}
           >
+            {/* Logo & Brand */}
             <a
               href="#"
-              className={`flex items-center shrink-0 z-10 transition-all duration-300 ${
-                navState !== 'visible' ? 'gap-0' : 'gap-3'
-              }`}
+              onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              className="flex items-center shrink-0 z-10 gap-2.5"
             >
               <img
                 src="/Logo_wo_bg.jpg"
                 alt="DiscoverFaro Logo"
-                className="h-10 w-10 rounded-lg object-cover"
+                className="h-9 w-9 rounded-xl object-cover"
               />
               <span
-                className={`font-vartigo text-white text-xl whitespace-nowrap transition-all duration-300 ${
-                  navState !== 'visible'
-                    ? 'opacity-0 max-w-0 overflow-hidden'
-                    : 'opacity-100 max-w-[200px]'
-                }`}
+                className={`font-vartigo text-lg whitespace-nowrap transition-colors duration-500 ${navExpanded ? 'text-gray-900' : 'text-white'}`}
               >
                 DiscoverFaro
               </span>
             </a>
+
+            {/* Center Nav Links */}
             <div
-              className={`hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2 transition-opacity duration-300 ${
-                navState !== 'visible' ? 'opacity-0 pointer-events-none' : 'opacity-100'
-              }`}
+              className={`hidden md:flex items-center gap-7 absolute left-1/2 -translate-x-1/2 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${navFullyExpanded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1 pointer-events-none'
+                }`}
             >
-              <a href="#features" className="text-gray-700 hover:text-blue-600 transition-colors duration-200 text-sm tracking-wide">
+              <a href="#features" onClick={(e) => { e.preventDefault(); document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-medium tracking-wide">
                 Features
               </a>
-              <a href="#how-it-works" className="text-gray-700 hover:text-blue-600 transition-colors duration-200 text-sm tracking-wide">
+              <a href="#how-it-works" onClick={(e) => { e.preventDefault(); document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-medium tracking-wide">
                 How it Works
               </a>
-              <a href="#community" className="text-gray-700 hover:text-blue-600 transition-colors duration-200 text-sm tracking-wide">
+              <a href="#community" onClick={(e) => { e.preventDefault(); document.getElementById('community')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-medium tracking-wide">
                 Community
               </a>
             </div>
+
+            {/* Download CTA */}
             <div
-              className={`absolute right-6 transition-opacity duration-300 ${
-                navState !== 'visible' ? 'opacity-0 pointer-events-none' : 'opacity-100'
-              }`}
+              className={`absolute right-5 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${navExpanded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'
+                }`}
             >
-              <Button className="rounded-full bg-black hover:bg-gray-800 text-white gap-2 shrink-0">
-                <Download size={18} />
-                Download
+              <Button className="rounded-full bg-gray-900 hover:bg-gray-800 text-white gap-2 shrink-0 text-sm px-5 py-2 shadow-sm">
+                <Download size={16} />
+                Pre-order
               </Button>
             </div>
           </div>
         </nav>
-      </motion.div>
+      </div>
 
       {/* Hero Section */}
       <section
@@ -195,28 +269,25 @@ export default function Home() {
           <motion.div variants={itemVariants} className="space-y-8 max-w-3xl mx-auto">
 
             {/* Heading */}
-            <div className="space-y-5">
-              <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 leading-[1.1]">
+            <div>
+              <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-[1.1]">
                 You capture the beauty.
                 <br />
-                <span className="font-vartigo bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
+                <span className="font-vartigo" style={{ background: 'linear-gradient(90deg, #4A90E2 0%, #6BBFF9 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
                   We handle the rest.
                 </span>
               </h1>
-              <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-xl mx-auto">
-                Turn your photos into local legends. The first AI-powered companion designed exclusively for Faro.
-              </p>
             </div>
 
             {/* Store Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
-              <button className="inline-flex items-center gap-3 bg-white hover:bg-gray-50 text-gray-900 font-semibold rounded-full px-8 py-4 shadow-lg shadow-blue-200/20 border border-gray-200/60 transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-2">
+              <button className="inline-flex items-center justify-center gap-3 bg-white hover:bg-gray-50 text-gray-900 font-semibold rounded-full py-4 shadow-lg shadow-blue-200/20 border border-gray-200/60 transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5 w-[220px]">
                 <img src="/logos/apple.png" alt="Apple" className="h-5 w-5" />
-                Download iOS App
+                Pre-order iOS
               </button>
-              <button className="inline-flex items-center gap-3 bg-white hover:bg-gray-50 text-gray-900 font-semibold rounded-full px-8 py-4 shadow-lg shadow-blue-200/20 border border-gray-200/60 transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5">
+              <button className="inline-flex items-center justify-center gap-3 bg-white hover:bg-gray-50 text-gray-900 font-semibold rounded-full py-4 shadow-lg shadow-blue-200/20 border border-gray-200/60 transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5 w-[220px]">
                 <img src="/logos/google-play.png" alt="Google Play" className="h-5 w-5" />
-                Pre-Order Android
+                Pre-order Android
               </button>
             </div>
           </motion.div>
@@ -408,36 +479,65 @@ export default function Home() {
               </div>
             </motion.div>
 
-            <motion.div
-              className="relative h-96 bg-gradient-to-br from-blue-100 to-amber-50 rounded-3xl overflow-hidden"
-              initial={{ opacity: 0, x: 30 }}
-              animate={communityRef.isVisible ? { opacity: 1, x: 0 } : { opacity: 0, x: 30 }}
-              transition={{ duration: 0.8 }}
-            >
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center space-y-4">
-                  <div className="flex justify-center gap-4">
-                    {["Jake", "Sarah", "Lara"].map((name, i) => (
-                      <motion.div
-                        key={i}
-                        className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg"
-                        animate={{ y: [0, -10, 0] }}
-                        transition={{ duration: 3, delay: i * 0.2, repeat: Infinity } as any}
-                      >
-                        {name[0]}
-                      </motion.div>
-                    ))}
-                  </div>
-                  <p className="text-gray-700 font-semibold">Collaborating on Faro adventure</p>
-                </div>
-              </div>
-            </motion.div>
+            <BouncingBubblesBox isVisible={communityRef.isVisible} />
           </motion.div>
         </div>
       </section>
 
       {/* Final CTA Section */}
-      <section ref={ctaRef.ref} className="relative min-h-[80vh] flex items-center justify-center overflow-hidden py-20 bg-gradient-to-r from-orange-400 via-blue-500 to-blue-600">
+      <section ref={ctaRef.ref} className="relative min-h-[80vh] flex items-center justify-center overflow-hidden py-20 cta-sky-bg">
+        {/* Animated floating clouds */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          {[...Array(6)].map((_, i) => (
+            <motion.div
+              key={`cloud-${i}`}
+              className="absolute rounded-full bg-white/10"
+              style={{
+                width: `${120 + i * 60}px`,
+                height: `${60 + i * 25}px`,
+                top: `${10 + i * 14}%`,
+                left: `-${150 + i * 40}px`,
+                filter: 'blur(20px)',
+              }}
+              animate={{
+                x: [0, typeof window !== 'undefined' ? window.innerWidth + 400 : 1800],
+              }}
+              transition={{
+                duration: 18 + i * 4,
+                repeat: Infinity,
+                ease: 'linear',
+                delay: i * 3,
+              }}
+            />
+          ))}
+          {/* Floating orbs */}
+          {[...Array(4)].map((_, i) => (
+            <motion.div
+              key={`orb-${i}`}
+              className="absolute rounded-full"
+              style={{
+                width: `${200 + i * 100}px`,
+                height: `${200 + i * 100}px`,
+                background: `radial-gradient(circle, ${['rgba(255,255,255,0.08)', 'rgba(0,180,255,0.06)', 'rgba(255,200,50,0.05)', 'rgba(100,200,255,0.07)'][i]
+                  } 0%, transparent 70%)`,
+                top: `${[15, 60, 30, 70][i]}%`,
+                left: `${[10, 65, 80, 25][i]}%`,
+              }}
+              animate={{
+                y: [0, -30, 0],
+                x: [0, 20, 0],
+                scale: [1, 1.1, 1],
+              }}
+              transition={{
+                duration: 8 + i * 2,
+                repeat: Infinity,
+                ease: 'easeInOut',
+                delay: i * 1.5,
+              }}
+            />
+          ))}
+        </div>
+
         <motion.div
           className="container mx-auto px-4 relative z-10 text-center space-y-8 max-w-2xl"
           initial={{ opacity: 0, y: 40 }}
@@ -446,7 +546,7 @@ export default function Home() {
         >
           <h2 className="text-5xl md:text-6xl font-bold text-white leading-tight">
             Plan Less.<br />
-            <span className="font-vartigo text-amber-200">Experience More.</span>
+            <span className="font-vartigo text-amber-200">Explore more.</span>
           </h2>
           <p className="text-xl text-white/90 leading-relaxed">
             Ready to discover Faro's hidden gems? Download the app today and start your adventure.
@@ -454,7 +554,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
             <Button className="rounded-full bg-white text-blue-600 hover:bg-gray-100 gap-2 px-8 py-6 text-lg font-semibold">
               <Download size={20} />
-              Download iOS
+              Pre-Order iOS
             </Button>
             <Button className="rounded-full bg-blue-600 hover:bg-blue-700 text-white gap-2 px-8 py-6 text-lg font-semibold border-2 border-white">
               Pre-Order Android
