@@ -146,7 +146,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Rethink Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
@@ -176,9 +176,13 @@
   }
 
   .cta-sky-bg {
-    background: linear-gradient(-45deg, #0077cc, #00a3ff, #38bdf8, #0ea5e9, #0284c7);
+    background: linear-gradient(-45deg, #38bdf8, #0ea5e9, #0284c7, #0369a1);
     background-size: 400% 400%;
     animation: ctaSkyShift 12s ease infinite;
+  }
+
+  .roamy-sky-bg {
+    background: linear-gradient(180deg, #38bdf8 0%, #0ea5e9 100%);
   }
 
   @keyframes ctaSkyShift {
