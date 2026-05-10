@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { motion, useScroll, useTransform, useSpring, AnimatePresence } from "framer-motion";
-import { Download, Zap, MapPin, ArrowRight, MousePointerClick } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { motion, useScroll, useTransform, useSpring, useMotionValueEvent, AnimatePresence } from "framer-motion";
+import { Download, Zap, MapPin, ArrowRight, MousePointerClick, Compass, Sparkles, Globe, Camera } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
 const useScrollAnimation = () => {
@@ -31,6 +32,62 @@ const useScrollAnimation = () => {
   }, []);
 
   return { ref, isVisible };
+};
+
+// Moving Clouds Component
+const MovingClouds = ({ count = 4, speedRange = [60, 90], opacityRange = [0.1, 0.25] }) => {
+  const cloudImages = ["/clouds/cloud1.png", "/clouds/cloud2.png", "/clouds/cloud3.png"];
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {[...Array(count)].map((_, i) => {
+        const size = 500 + Math.random() * 300;
+        const top = 5 + (i * (80 / count)) + (Math.random() * 10); // Spread them vertically for consistency
+        const duration = speedRange[0] + Math.random() * (speedRange[1] - speedRange[0]);
+        const delay = -Math.random() * duration;
+        const opacity = opacityRange[0] + Math.random() * (opacityRange[1] - opacityRange[0]);
+        const cloudImg = cloudImages[i % cloudImages.length];
+
+        return (
+          <motion.div
+            key={i}
+            className="absolute"
+            style={{
+              width: size,
+              height: size * 0.7,
+              top: `${top}%`,
+              left: "-50%",
+              opacity: opacity,
+              mixBlendMode: "screen" as any,
+            }}
+            animate={{
+              x: ["0vw", "150vw"],
+              y: [0, 20, 0], // Reduced vertical oscillation for "consistency"
+            }}
+            transition={{
+              x: {
+                duration: duration,
+                repeat: Infinity,
+                ease: "linear",
+                delay: delay,
+              },
+              y: {
+                duration: 12 + Math.random() * 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+              },
+            }}
+          >
+            <img 
+              src={cloudImg} 
+              alt="Cloud" 
+              className="w-full h-full object-contain brightness-110 contrast-105"
+            />
+          </motion.div>
+        );
+      })}
+    </div>
+  );
 };
 
 // Interactive Background Component
@@ -68,131 +125,287 @@ const InteractiveSkyBackground = () => {
         }}
         transition={{ type: "spring", damping: 30, stiffness: 40, mass: 2 }}
       />
-      {/* Static ambient clouds */}
-      {[...Array(5)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute rounded-full bg-white/10 blur-3xl"
-          style={{
-            width: `${300 + i * 100}px`,
-            height: `${200 + i * 80}px`,
-            top: `${10 + i * 20}%`,
-            left: `${-10 + i * 25}%`,
-          }}
-          animate={{
-            x: [0, 50, 0],
-            y: [0, 30, 0],
-          }}
-          transition={{
-            duration: 15 + i * 2,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-      ))}
+      {/* Moving clouds removed from CTA section as per user feedback */}
     </div>
   );
 };
 
+// Feature data for sticky scroll section
+const stickyFeatures = [
+  {
+    icon: Camera,
+    title: "AI Scan & Discover",
+    description: "Snap a photo of any monument. Our AI identifies it instantly, sharing the history and soul of Faro directly to your screen.",
+    tags: [
+      { label: "Camera", bg: "bg-sky-50", text: "text-sky-600" },
+      { label: "AI Magic", bg: "bg-pink-50", text: "text-pink-600" },
+    ],
+    color: "bg-sky-500",
+    shadowColor: "shadow-sky-500/30",
+    accentBg: "bg-sky-100",
+    gradientFrom: "from-sky-50",
+    gradientTo: "to-white",
+    number: "01",
+  },
+  {
+    icon: Compass,
+    title: "Smart Route Planner",
+    description: "Tell us your mood. We build an optimized, day-by-day itinerary that adjusts to Faro's real-time events and weather.",
+    tags: [
+      { label: "Planning", bg: "bg-amber-50", text: "text-amber-600" },
+      { label: "Optimization", bg: "bg-emerald-50", text: "text-emerald-600" },
+    ],
+    color: "bg-amber-400",
+    shadowColor: "shadow-amber-400/30",
+    accentBg: "bg-amber-100",
+    gradientFrom: "from-amber-50",
+    gradientTo: "to-white",
+    number: "02",
+  },
+  {
+    icon: Globe,
+    title: "Offline & Multilingual",
+    description: "Download your itinerary before you go. Access maps, history, and AI insights offline — in 12 languages.",
+    tags: [
+      { label: "Offline", bg: "bg-emerald-50", text: "text-emerald-600" },
+      { label: "12 Languages", bg: "bg-violet-50", text: "text-violet-600" },
+    ],
+    color: "bg-emerald-500",
+    shadowColor: "shadow-emerald-500/30",
+    accentBg: "bg-emerald-100",
+    gradientFrom: "from-emerald-50",
+    gradientTo: "to-white",
+    number: "03",
+  },
+  {
+    icon: Sparkles,
+    title: "Personalized Tips",
+    description: "From the best pastel de nata to hidden beaches — our AI learns your style and curates hidden gems just for you.",
+    tags: [
+      { label: "Curated", bg: "bg-pink-50", text: "text-pink-600" },
+      { label: "Personal AI", bg: "bg-sky-50", text: "text-sky-600" },
+    ],
+    color: "bg-pink-500",
+    shadowColor: "shadow-pink-500/30",
+    accentBg: "bg-pink-100",
+    gradientFrom: "from-pink-50",
+    gradientTo: "to-white",
+    number: "04",
+  },
+];
+
+// Sticky Scroll Features Section Component
+const StickyFeaturesSection = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [activeFeature, setActiveFeature] = useState(0);
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"],
+  });
+
+  const progressHeight = useSpring(
+    useTransform(scrollYProgress, [0, 1], [0, 100]),
+    { stiffness: 100, damping: 30 }
+  );
+
+  // Track which feature is active based on scroll
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    const featureCount = stickyFeatures.length;
+    const index = Math.min(
+      Math.floor(latest * featureCount),
+      featureCount - 1
+    );
+    setActiveFeature(index);
+  });
+
+  return (
+    <section
+      id="features"
+      ref={sectionRef}
+      className="relative bg-gray-50"
+      style={{ height: `${(stickyFeatures.length + 1) * 100}vh` }}
+    >
+      {/* Sticky Container — pinned below the navbar */}
+      <div className="sticky top-0 h-screen">
+        <div className="container mx-auto px-4 h-full flex flex-col lg:flex-row items-center gap-8 lg:gap-16 pt-28 pb-12">
+          
+          {/* LEFT: Sticky heading + progress */}
+          <div className="w-full lg:w-5/12 flex flex-col justify-center items-start space-y-10 shrink-0">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="space-y-4"
+            >
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight leading-tight">
+                Everything you need for{" "}
+                <span className="text-sky-500 font-vartigo block mt-1">
+                  Smarter Trips
+                </span>
+              </h2>
+              <p className="text-lg text-gray-500 font-medium max-w-md">
+                Four powerful features that transform how you explore Faro.
+              </p>
+            </motion.div>
+
+            {/* Vertical progress rail + dots */}
+            <div className="hidden lg:flex items-start gap-6">
+              {/* Progress bar */}
+              <div className="relative w-1 h-48 bg-gray-200 rounded-full overflow-hidden">
+                <motion.div
+                  className="absolute top-0 left-0 w-full bg-sky-500 rounded-full"
+                  style={{ height: progressHeight.get ? undefined : "0%" }}
+                  animate={{ height: `${((activeFeature + 1) / stickyFeatures.length) * 100}%` }}
+                  transition={{ type: "spring", stiffness: 100, damping: 20 }}
+                />
+              </div>
+              {/* Feature step labels */}
+              <div className="flex flex-col gap-5">
+                {stickyFeatures.map((feature, idx) => (
+                  <motion.div
+                    key={idx}
+                    className="flex items-center gap-3 cursor-pointer group"
+                    animate={{
+                      opacity: activeFeature === idx ? 1 : 0.4,
+                    }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div
+                      className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-black text-white transition-all duration-300 ${
+                        activeFeature === idx
+                          ? feature.color + " shadow-lg scale-110"
+                          : "bg-gray-300 scale-100"
+                      }`}
+                    >
+                      {feature.number}
+                    </div>
+                    <span
+                      className={`text-sm font-bold transition-all duration-300 ${
+                        activeFeature === idx ? "text-gray-900" : "text-gray-400"
+                      }`}
+                    >
+                      {feature.title}
+                    </span>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            {/* Mobile progress dots */}
+            <div className="flex lg:hidden gap-2">
+              {stickyFeatures.map((feature, idx) => (
+                <motion.div
+                  key={idx}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    activeFeature === idx ? feature.color + " w-8" : "bg-gray-300 w-2"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* RIGHT: Animated feature card */}
+          <div className="w-full lg:w-7/12 flex items-center justify-center relative min-h-[400px] lg:min-h-0 lg:h-full">
+            <AnimatePresence mode="wait">
+              {stickyFeatures.map(
+                (feature, idx) =>
+                  activeFeature === idx && (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, y: 40, scale: 0.96 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -30, scale: 0.96 }}
+                      transition={{
+                        duration: 0.5,
+                        type: "spring",
+                        bounce: 0.25,
+                      }}
+                      className="absolute inset-0 flex items-center justify-center p-2"
+                    >
+                      <div
+                        className={`group relative bg-white rounded-[2.5rem] overflow-hidden shadow-2xl shadow-gray-200/60 border border-gray-100/80 p-10 md:p-14 w-full max-w-xl transition-all duration-500`}
+                      >
+                        {/* Corner accent blob */}
+                        <div
+                          className={`absolute top-0 right-0 w-40 h-40 ${feature.accentBg} rounded-bl-[120px] -z-0 transition-transform duration-500 group-hover:scale-125`}
+                        />
+
+
+                        <div className="relative z-10 space-y-6">
+                          {/* Icon */}
+                          <motion.div
+                            className={`inline-flex p-4 ${feature.color} text-white rounded-2xl shadow-lg ${feature.shadowColor}`}
+                            initial={{ rotate: -10, scale: 0.8 }}
+                            animate={{ rotate: 0, scale: 1 }}
+                            transition={{
+                              delay: 0.15,
+                              type: "spring",
+                              bounce: 0.5,
+                            }}
+                          >
+                            <feature.icon size={32} strokeWidth={2.2} />
+                          </motion.div>
+
+                          {/* Title */}
+                          <h3 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight font-vartigo">
+                            {feature.title}
+                          </h3>
+
+                          {/* Description */}
+                          <p className="text-lg text-gray-600 leading-relaxed font-medium max-w-md">
+                            {feature.description}
+                          </p>
+
+                          {/* Tags */}
+                          <div className="flex flex-wrap gap-3 pt-2">
+                            {feature.tags.map((tag, tIdx) => (
+                              <motion.span
+                                key={tIdx}
+                                className={`px-4 py-2 ${tag.bg} ${tag.text} rounded-full text-sm font-bold`}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.2 + tIdx * 0.1 }}
+                              >
+                                {tag.label}
+                              </motion.span>
+                            ))}
+                          </div>
+
+
+                        </div>
+                      </div>
+                    </motion.div>
+                  )
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 export default function Home() {
-  const [activeStep, setActiveStep] = useState(0);
-  const featuresRef = useScrollAnimation();
-  const stepsRef = useScrollAnimation();
   const ctaRef = useScrollAnimation();
+  const [iosSubmitted, setIosSubmitted] = useState(false);
+  const [androidSubmitted, setAndroidSubmitted] = useState(false);
 
   // Parallax Hero
   const { scrollY } = useScroll();
-  const y1 = useTransform(scrollY, [0, 1000], [0, 200]);
   const y2 = useTransform(scrollY, [0, 1000], [0, -100]);
   const opacityText = useTransform(scrollY, [0, 400], [1, 0]);
 
-  // Navbar expand animation
-  const [navExpanded, setNavExpanded] = useState(false);
-  const [navFullyExpanded, setNavFullyExpanded] = useState(false);
-
-  // Scroll Progress
-  const scaleX = useSpring(scrollY, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001
-  });
-
-  const scrollProgress = useTransform(scrollY, [0, 2000], [0, 1]);
-  const progressSpring = useSpring(scrollProgress, { stiffness: 100, damping: 30 });
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const pastHero = window.scrollY > window.innerHeight * 0.4;
-      setNavExpanded(pastHero);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    let timer: ReturnType<typeof setTimeout>;
-    if (navExpanded) {
-      timer = setTimeout(() => setNavFullyExpanded(true), 350);
-    } else {
-      setNavFullyExpanded(false);
-    }
-    return () => clearTimeout(timer);
-  }, [navExpanded]);
-
   return (
-    <div className="min-h-screen bg-gray-50 selection:bg-sky-200 overflow-x-hidden">
-      {/* Scroll Progress Bar */}
-      <motion.div
-        className="fixed top-0 left-0 right-0 h-1.5 bg-sky-500 z-[60] origin-left"
-        style={{ scaleX: progressSpring }}
-      />
-      {/* Navigation Bar */}
-      <div className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 pt-4 pointer-events-none">
-        <nav
-          className={`mx-auto bg-white/80 backdrop-blur-md border border-white/50 rounded-[28px] overflow-hidden pointer-events-auto transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] shadow-sm ${navExpanded ? 'max-w-5xl' : 'max-w-[220px]'}`}
-        >
-          <div className={`flex flex-nowrap items-center relative transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${navExpanded ? 'justify-between px-5 py-2.5' : 'justify-center px-3 py-2.5'}`}>
-            {/* Logo */}
-            <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="flex items-center shrink-0 z-10 gap-2.5">
-              <img src="/Logo_wo_bg.jpg" alt="DiscoverFaro Logo" className="h-8 w-8 object-contain" />
-              <span className={`font-vartigo text-xl transition-colors duration-500 ${navExpanded ? 'text-gray-900' : 'text-gray-900'}`}>
-                DiscoverFaro
-              </span>
-            </a>
+    <div className="min-h-screen bg-gray-50 selection:bg-sky-200 overflow-x-clip">
 
-            {/* Links */}
-            <div className={`hidden md:flex items-center gap-7 absolute left-1/2 -translate-x-1/2 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${navFullyExpanded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1 pointer-events-none'}`}>
-              <a href="#features" onClick={(e) => { e.preventDefault(); document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-gray-600 hover:text-sky-500 transition-colors duration-200 text-sm font-semibold tracking-wide">
-                Features
-              </a>
-              <a href="#how-it-works" onClick={(e) => { e.preventDefault(); document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-gray-600 hover:text-sky-500 transition-colors duration-200 text-sm font-semibold tracking-wide">
-                How it Works
-              </a>
-            </div>
-
-            {/* CTA */}
-            <div className={`absolute right-5 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${navExpanded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'}`}>
-              <Button className="rounded-full bg-sky-500 hover:bg-sky-600 text-white gap-2 shrink-0 text-sm px-5 py-2 shadow-md shadow-sky-500/20 font-bold">
-                <Download size={16} />
-                Get App
-              </Button>
-            </div>
-          </div>
-        </nav>
-      </div>
 
       {/* Hero Section (Roamy Style) */}
-      <section className="relative min-h-[100svh] flex items-center justify-center overflow-hidden roamy-sky-bg pt-24 pb-32">
-        <motion.div style={{ y: y1 }} className="absolute inset-0 z-0 opacity-50">
-           {/* Decorative Background Clouds - Using SVG for crisp edges */}
-           <svg className="absolute top-[10%] left-[5%] w-64 h-32 text-white/40" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M17.5 19c-2.485 0-4.5-2.015-4.5-4.5 0-.416.056-.817.159-1.2A5.967 5.967 0 0012 14c-3.314 0-6-2.686-6-6 0-3.153 2.433-5.74 5.518-5.981A4.5 4.5 0 0120.5 5.5c0 .248-.02.491-.059.729C22.484 7.07 24 8.87 24 11c0 2.761-2.239 5-5 5v3zm-5.5-5c1.657 0 3-1.343 3-3 0-1.657-1.343-3-3-3-1.657 0-3 1.343-3 3 0 1.657 1.343 3 3 3z" />
-           </svg>
-           <svg className="absolute top-[40%] right-[10%] w-96 h-48 text-white/30" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M17.5 19c-2.485 0-4.5-2.015-4.5-4.5 0-.416.056-.817.159-1.2A5.967 5.967 0 0012 14c-3.314 0-6-2.686-6-6 0-3.153 2.433-5.74 5.518-5.981A4.5 4.5 0 0120.5 5.5c0 .248-.02.491-.059.729C22.484 7.07 24 8.87 24 11c0 2.761-2.239 5-5 5v3z" />
-           </svg>
-        </motion.div>
+      <section className="relative min-h-[110svh] flex items-center justify-center overflow-hidden roamy-sky-bg pt-16 pb-48">
+        <div className="absolute inset-0 z-0 overflow-hidden">
+           <MovingClouds count={5} speedRange={[60, 90]} opacityRange={[0.15, 0.35]} />
+        </div>
 
         <motion.div 
           style={{ y: y2, opacity: opacityText }}
@@ -233,230 +446,147 @@ export default function Home() {
           </motion.div>
         </motion.div>
         
-        {/* Bottom wave transition */}
-        <div className="absolute bottom-0 left-0 right-0 z-0 translate-y-[2px] pointer-events-none">
-          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto text-gray-50 drop-shadow-sm">
-             <path d="M0 120H1440V42.0001C1440 42.0001 1133 -19.9999 720 30.0001C307 80.0001 0 42.0001 0 42.0001V120Z" fill="currentColor"/>
-          </svg>
-        </div>
+        {/* Smooth gradient transition — blue sky fading to white */}
+        <div className="absolute bottom-0 left-0 right-0 h-[30vh] z-10 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(249,250,251,0.3) 30%, rgba(249,250,251,0.7) 60%, rgb(249,250,251) 100%)' }} />
       </section>
 
-      {/* Feature Grid Section */}
-      <motion.section 
-        id="features" 
-        ref={featuresRef.ref} 
-        className="py-24 md:py-32 relative bg-gray-50"
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-      >
-        <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            className="text-center mb-20 space-y-4"
-            initial={{ opacity: 0, y: 30 }}
-            animate={featuresRef.isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight">
-              Everything you need for <br/>
-              <span className="text-sky-500 font-vartigo">Smarter Trips</span>
-            </h2>
-          </motion.div>
+      {/* Sticky Scroll Features Section */}
+      <StickyFeaturesSection />
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            {/* Feature Card 1 */}
-            <motion.div
-              whileHover={{ y: -10, scale: 1.02 }}
-              className="group relative bg-white rounded-[2rem] overflow-hidden shadow-xl shadow-sky-100/50 border border-gray-100 p-10 transition-all duration-300"
-              initial={{ opacity: 0, x: -30 }}
-              animate={featuresRef.isVisible ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
-              transition={{ duration: 0.8, type: "spring" }}
-            >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-sky-100 rounded-bl-[100px] -z-10 transition-all group-hover:scale-110" />
-              <div className="relative z-10 space-y-6">
-                <div className="inline-flex p-4 bg-sky-500 text-white rounded-2xl shadow-lg shadow-sky-500/30">
-                  <Zap size={32} />
-                </div>
-                <h3 className="text-3xl font-extrabold text-gray-900">AI Scan & Discover</h3>
-                <p className="text-lg text-gray-600 leading-relaxed font-medium">
-                  Snap a photo of any monument. Our AI identifies it instantly, sharing the history and soul of Faro directly to your screen.
-                </p>
-                <div className="flex gap-3 pt-2">
-                  <span className="px-4 py-2 bg-sky-50 text-sky-600 rounded-full text-sm font-bold">Camera</span>
-                  <span className="px-4 py-2 bg-pink-50 text-pink-600 rounded-full text-sm font-bold">AI Magic</span>
-                </div>
-              </div>
-            </motion.div>
 
-            {/* Feature Card 2 */}
-            <motion.div
-              whileHover={{ y: -10, scale: 1.02 }}
-              className="group relative bg-white rounded-[2rem] overflow-hidden shadow-xl shadow-sky-100/50 border border-gray-100 p-10 transition-all duration-300"
-              initial={{ opacity: 0, x: 30 }}
-              animate={featuresRef.isVisible ? { opacity: 1, x: 0 } : { opacity: 0, x: 30 }}
-              transition={{ duration: 0.8, type: "spring", delay: 0.1 }}
-            >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-100 rounded-bl-[100px] -z-10 transition-all group-hover:scale-110" />
-              <div className="relative z-10 space-y-6">
-                <div className="inline-flex p-4 bg-amber-400 text-white rounded-2xl shadow-lg shadow-amber-400/30">
-                  <MapPin size={32} />
-                </div>
-                <h3 className="text-3xl font-extrabold text-gray-900">Smart Route Planner</h3>
-                <p className="text-lg text-gray-600 leading-relaxed font-medium">
-                  Tell us your mood. We build an optimized, day-by-day itinerary that adjusts to Faro's real-time events.
-                </p>
-                <div className="flex gap-3 pt-2">
-                  <span className="px-4 py-2 bg-amber-50 text-amber-600 rounded-full text-sm font-bold">Planning</span>
-                  <span className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-full text-sm font-bold">Optimization</span>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </motion.section>
 
-      {/* Step by Step Section (Interactive Bouncy Cards) */}
-      <motion.section 
-        id="how-it-works" 
-        ref={stepsRef.ref} 
-        className="py-24 md:py-32 bg-white relative overflow-hidden"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 1 }}
-      >
-        {/* Background decorative elements */}
-        <div className="absolute top-20 left-10 w-64 h-64 bg-sky-50 rounded-full blur-3xl opacity-50" />
-        <div className="absolute bottom-20 right-10 w-80 h-80 bg-pink-50 rounded-full blur-3xl opacity-50" />
-
-        <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 30 }}
-            animate={stepsRef.isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight">
-              From scroll to 📸 <br/> Suitcase in minutes
-            </h2>
-          </motion.div>
-
-          <div className="max-w-4xl mx-auto flex flex-col md:flex-row gap-6">
-            {[
-              { num: "01", title: "Point & Shoot", color: "bg-sky-500", shadow: "shadow-sky-500/20" },
-              { num: "02", title: "Build collection", color: "bg-pink-500", shadow: "shadow-pink-500/20" },
-              { num: "03", title: "Let AI lead", color: "bg-amber-400", shadow: "shadow-amber-400/20" },
-            ].map((step, idx) => (
-              <motion.div
-                key={idx}
-                className={`flex-1 rounded-[2rem] p-8 cursor-pointer transition-all duration-500 border-2 ${activeStep === idx ? `bg-white ${step.shadow} border-transparent shadow-2xl scale-105 z-10` : 'bg-gray-50 border-gray-100 hover:bg-gray-100'}`}
-                onClick={() => setActiveStep(idx)}
-                initial={{ opacity: 0, y: 50 }}
-                animate={stepsRef.isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-                transition={{ duration: 0.6, delay: idx * 0.15, type: "spring" }}
-              >
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-white font-black text-xl mb-6 shadow-lg ${step.color}`}>
-                  {step.num}
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">{step.title}</h3>
-                
-                <AnimatePresence>
-                  {activeStep === idx && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden"
-                    >
-                      <p className="text-gray-600 font-medium pb-4">
-                        {idx === 0 && "Capture any spot in Faro. Our AI extracts the cultural context automatically from your camera."}
-                        {idx === 1 && "Organize spots into curated lists: Old Town, Ria Formosa, or Best Seafood to share later."}
-                        {idx === 2 && "Pick your dates and let DiscoverFaro generate your perfect, optimized path through the city."}
-                      </p>
-                      <div className={`inline-flex items-center gap-2 font-bold ${idx === 0 ? 'text-sky-600' : idx === 1 ? 'text-pink-600' : 'text-amber-600'}`}>
-                        Try it now <ArrowRight size={18} />
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </motion.section>
-
-      {/* Final CTA Section (Interactive Sky) */}
-      <section ref={ctaRef.ref} className="relative min-h-[70vh] flex items-center justify-center overflow-hidden py-24 bg-sky-900">
+      {/* Final CTA Section & Footer Wrapper (Shared Interactive Sky) */}
+      <section ref={ctaRef.ref} className="relative min-h-[100svh] flex flex-col overflow-hidden bg-sky-900">
         <InteractiveSkyBackground />
         
-        <motion.div
-          className="container mx-auto px-4 relative z-10 text-center space-y-10 max-w-3xl"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={ctaRef.isVisible ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
-          transition={{ duration: 0.8, type: "spring" }}
-        >
-          <h2 className="text-5xl md:text-7xl font-extrabold text-white leading-tight tracking-tight drop-shadow-lg">
-            Plan Less.<br />
-            <span className="text-sky-300 font-vartigo">Explore more.</span>
-          </h2>
-          <p className="text-xl md:text-2xl text-white/90 font-medium leading-relaxed drop-shadow">
-            Ready to discover Faro's hidden gems? Sign up for the pre-order waitlist today.
-          </p>
-          
-          <form 
-            onSubmit={(e) => e.preventDefault()}
-            className="flex flex-col sm:flex-row gap-3 justify-center items-center pt-8 max-w-2xl mx-auto w-full"
+        {/* Main CTA Content - flex-1 to push footer down and center content */}
+        <div className="flex-1 flex items-center justify-center relative z-10 w-full py-16">
+          <motion.div
+            className="container mx-auto px-4 text-center space-y-10 max-w-3xl"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={ctaRef.isVisible ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.8, type: "spring" }}
           >
-            <Input 
-              placeholder="Your Name" 
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-full h-14 px-6 focus:bg-white/20 transition-all w-full sm:w-auto sm:flex-1"
-            />
-            <Input 
-              type="email"
-              placeholder="Email Address" 
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-full h-14 px-6 focus:bg-white/20 transition-all w-full sm:w-auto sm:flex-1"
-            />
-            <Button className="rounded-full bg-white text-sky-900 hover:bg-sky-50 transition-all h-14 px-10 font-bold text-lg shadow-xl w-full sm:w-auto">
-              Join Waitlist
-            </Button>
-          </form>
-        </motion.div>
-      </section>
+            <h2 className="text-5xl md:text-7xl font-extrabold text-white leading-tight tracking-tight drop-shadow-lg">
+              Plan Less.<br />
+              <span className="text-sky-300 font-vartigo">Explore more.</span>
+            </h2>
+            <p className="text-xl md:text-2xl text-white/90 font-medium leading-relaxed drop-shadow">
+              Ready to discover Faro's hidden gems? Sign up for the pre-order waitlist today.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8 max-w-2xl mx-auto w-full">
+              {/* iOS Pre-order Modal */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="rounded-full bg-white text-gray-900 hover:bg-gray-100 transition-all h-14 px-8 font-bold text-lg shadow-xl w-full sm:w-auto flex items-center gap-3">
+                    <img src="/logos/apple.png" alt="Apple" className="h-6 w-6" />
+                    Pre-order iOS
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md text-center p-8 rounded-[2rem]">
+                  <div className="flex flex-col items-center gap-4">
+                    <img src="/logos/apple.png" alt="Apple" className="h-12 w-12" />
+                    <h3 className="text-2xl font-extrabold text-gray-900">Pre-order iOS</h3>
+                    <p className="text-gray-500 font-medium mb-2">Be the first to know when DiscoverFaro launches on iOS!</p>
+                    
+                    {iosSubmitted ? (
+                      <div className="py-6 text-gray-700 font-medium text-lg">
+                        You're on the list! We'll notify you when DiscoverFaro is available on iOS.
+                      </div>
+                    ) : (
+                      <form onSubmit={(e) => { e.preventDefault(); setIosSubmitted(true); }} className="w-full space-y-4">
+                        <Input 
+                          required
+                          placeholder="First name" 
+                          className="h-12 rounded-xl border-gray-200 focus:border-sky-500 w-full text-base"
+                        />
+                        <Input 
+                          required
+                          type="email"
+                          placeholder="Email address" 
+                          className="h-12 rounded-xl border-gray-200 focus:border-sky-500 w-full text-base"
+                        />
+                        <Button type="submit" className="w-full h-12 rounded-xl bg-black text-white font-bold text-base mt-2 hover:bg-gray-800 transition-colors">
+                          Join Waitlist
+                        </Button>
+                      </form>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
 
-      {/* Footer */}
-      <footer className="bg-white text-gray-600 py-16 border-t border-gray-100">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-10 mb-12">
-            <div className="col-span-1 md:col-span-2">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="bg-sky-500 rounded-xl p-1.5">
-                   <img src="/Logo_wo_bg.jpg" alt="DiscoverFaro Logo" className="h-8 w-8 rounded-lg mix-blend-multiply" />
-                </div>
-                <span className="font-extrabold text-2xl text-gray-900">DiscoverFaro</span>
-              </div>
-              <p className="text-lg font-medium max-w-sm">The AI-powered travel companion turning saved spots into real trips.</p>
+              {/* Android Pre-order Modal */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="rounded-full bg-white text-gray-900 hover:bg-gray-100 transition-all h-14 px-8 font-bold text-lg shadow-xl w-full sm:w-auto flex items-center gap-3">
+                    <img src="/logos/google-play.png" alt="Google Play" className="h-6 w-6" />
+                    Pre-order Android
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md text-center p-8 rounded-[2rem]">
+                  <div className="flex flex-col items-center gap-4">
+                    <img src="/logos/google-play.png" alt="Google Play" className="h-12 w-12" />
+                    <h3 className="text-2xl font-extrabold text-gray-900">Pre-order Android</h3>
+                    <p className="text-gray-500 font-medium mb-2">Be the first to know when DiscoverFaro launches on Android!</p>
+                    
+                    {androidSubmitted ? (
+                      <div className="py-6 text-gray-700 font-medium text-lg">
+                        You're on the list! We'll notify you when DiscoverFaro is available on Android.
+                      </div>
+                    ) : (
+                      <form onSubmit={(e) => { e.preventDefault(); setAndroidSubmitted(true); }} className="w-full space-y-4">
+                        <Input 
+                          required
+                          placeholder="First name" 
+                          className="h-12 rounded-xl border-gray-200 focus:border-sky-500 w-full text-base"
+                        />
+                        <Input 
+                          required
+                          type="email"
+                          placeholder="Email address" 
+                          className="h-12 rounded-xl border-gray-200 focus:border-sky-500 w-full text-base"
+                        />
+                        <Button type="submit" className="w-full h-12 rounded-xl bg-black text-white font-bold text-base mt-2 hover:bg-gray-800 transition-colors">
+                          Join Waitlist
+                        </Button>
+                      </form>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
-            <div>
-              <h4 className="font-bold text-gray-900 mb-6 text-lg">Product</h4>
-              <ul className="space-y-4 font-medium">
-                <li><a href="#features" className="hover:text-sky-500 transition-colors">Features</a></li>
-                <li><a href="#how-it-works" className="hover:text-sky-500 transition-colors">How it Works</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold text-gray-900 mb-6 text-lg">Legal</h4>
-              <ul className="space-y-4 font-medium">
-                <li><a href="#" className="hover:text-sky-500 transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-sky-500 transition-colors">Terms of Service</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-100 pt-8 text-center font-medium text-gray-500">
-            <p>© 2026 DiscoverFaro. Built for the modern traveler.</p>
-          </div>
+          </motion.div>
         </div>
-      </footer>
+
+        {/* Flat Footer */}
+        <footer className="w-full relative z-10 py-6 border-t border-white/10 text-white/70 bg-transparent">
+          <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="text-sm font-medium">
+              © 2026 by Logos Studio Inc. All rights reserved.
+            </div>
+            
+            <div className="flex items-center gap-6 text-sm font-medium">
+              <a href="mailto:support@discoverfaro.com" className="hover:text-white transition-colors">Support</a>
+              <a href="#" className="hover:text-white transition-colors">Terms & Conditions</a>
+              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <a href="#" className="hover:text-white transition-colors" aria-label="Instagram">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"></path>
+                </svg>
+              </a>
+              <a href="#" className="hover:text-white transition-colors" aria-label="TikTok">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-.88-.05A6.33 6.33 0 0 0 5.16 20.5a6.33 6.33 0 0 0 10.86-4.43V7.83a8.24 8.24 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.2-.26z"></path>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </footer>
+      </section>
     </div>
   );
 }
