@@ -36,7 +36,7 @@ const useScrollAnimation = () => {
 
 // Moving Clouds Component
 const MovingClouds = ({ count = 4, speedRange = [60, 90], opacityRange = [0.1, 0.25] }) => {
-  const cloudImages = ["/clouds/cloud1.png", "/clouds/cloud2.png", "/clouds/cloud3.png"];
+  const cloudImages = ["/clouds/cloud1.png"];
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -78,9 +78,9 @@ const MovingClouds = ({ count = 4, speedRange = [60, 90], opacityRange = [0.1, 0
               },
             }}
           >
-            <img 
-              src={cloudImg} 
-              alt="Cloud" 
+            <img
+              src={cloudImg}
+              alt="Cloud"
               className="w-full h-full object-contain brightness-110 contrast-105"
             />
           </motion.div>
@@ -228,8 +228,8 @@ const StickyFeaturesSection = () => {
     >
       {/* Sticky Container — pinned below the navbar */}
       <div className="sticky top-0 h-screen">
-        <div className="container mx-auto px-4 h-full flex flex-col lg:flex-row items-center gap-8 lg:gap-16 pt-28 pb-12">
-          
+        <div className="container mx-auto px-4 h-full flex flex-col lg:flex-row items-center gap-8 lg:gap-16">
+
           {/* LEFT: Sticky heading + progress */}
           <div className="w-full lg:w-5/12 flex flex-col justify-center items-start space-y-10 shrink-0">
             <motion.div
@@ -273,18 +273,16 @@ const StickyFeaturesSection = () => {
                     transition={{ duration: 0.3 }}
                   >
                     <div
-                      className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-black text-white transition-all duration-300 ${
-                        activeFeature === idx
+                      className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-black text-white transition-all duration-300 ${activeFeature === idx
                           ? feature.color + " shadow-lg scale-110"
                           : "bg-gray-300 scale-100"
-                      }`}
+                        }`}
                     >
                       {feature.number}
                     </div>
                     <span
-                      className={`text-sm font-bold transition-all duration-300 ${
-                        activeFeature === idx ? "text-gray-900" : "text-gray-400"
-                      }`}
+                      className={`text-sm font-bold transition-all duration-300 ${activeFeature === idx ? "text-gray-900" : "text-gray-400"
+                        }`}
                     >
                       {feature.title}
                     </span>
@@ -298,9 +296,8 @@ const StickyFeaturesSection = () => {
               {stickyFeatures.map((feature, idx) => (
                 <motion.div
                   key={idx}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    activeFeature === idx ? feature.color + " w-8" : "bg-gray-300 w-2"
-                  }`}
+                  className={`h-2 rounded-full transition-all duration-300 ${activeFeature === idx ? feature.color + " w-8" : "bg-gray-300 w-2"
+                    }`}
                 />
               ))}
             </div>
@@ -404,10 +401,10 @@ export default function Home() {
       {/* Hero Section (Roamy Style) */}
       <section className="relative min-h-[110svh] flex items-center justify-center overflow-hidden roamy-sky-bg pt-16 pb-48">
         <div className="absolute inset-0 z-0 overflow-hidden">
-           <MovingClouds count={5} speedRange={[60, 90]} opacityRange={[0.15, 0.35]} />
+          <MovingClouds count={5} speedRange={[60, 90]} opacityRange={[0.15, 0.35]} />
         </div>
 
-        <motion.div 
+        <motion.div
           style={{ y: y2, opacity: opacityText }}
           className="container mx-auto px-4 relative z-10 text-center"
         >
@@ -426,7 +423,7 @@ export default function Home() {
 
             {/* Store Buttons - White pill style */}
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-8">
-              <motion.button 
+              <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="inline-flex items-center justify-center gap-3 bg-white text-gray-900 font-bold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 w-[240px] h-16 px-6"
@@ -434,7 +431,7 @@ export default function Home() {
                 <img src="/logos/apple.png" alt="Apple" className="h-6 w-6" />
                 Pre-order iOS
               </motion.button>
-              <motion.button 
+              <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="inline-flex items-center justify-center gap-3 bg-white text-gray-900 font-bold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 w-[240px] h-16 px-6"
@@ -445,7 +442,7 @@ export default function Home() {
             </div>
           </motion.div>
         </motion.div>
-        
+
         {/* Smooth gradient transition — blue sky fading to white */}
         <div className="absolute bottom-0 left-0 right-0 h-[30vh] z-10 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(249,250,251,0.3) 30%, rgba(249,250,251,0.7) 60%, rgb(249,250,251) 100%)' }} />
       </section>
@@ -458,7 +455,7 @@ export default function Home() {
       {/* Final CTA Section & Footer Wrapper (Shared Interactive Sky) */}
       <section ref={ctaRef.ref} className="relative min-h-[100svh] flex flex-col overflow-hidden bg-sky-900">
         <InteractiveSkyBackground />
-        
+
         {/* Main CTA Content - flex-1 to push footer down and center content */}
         <div className="flex-1 flex items-center justify-center relative z-10 w-full py-16">
           <motion.div
@@ -474,7 +471,7 @@ export default function Home() {
             <p className="text-xl md:text-2xl text-white/90 font-medium leading-relaxed drop-shadow">
               Ready to discover Faro's hidden gems? Sign up for the pre-order waitlist today.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8 max-w-2xl mx-auto w-full">
               {/* iOS Pre-order Modal */}
               <Dialog>
@@ -489,23 +486,23 @@ export default function Home() {
                     <img src="/logos/apple.png" alt="Apple" className="h-12 w-12" />
                     <h3 className="text-2xl font-extrabold text-gray-900">Pre-order iOS</h3>
                     <p className="text-gray-500 font-medium mb-2">Be the first to know when DiscoverFaro launches on iOS!</p>
-                    
+
                     {iosSubmitted ? (
                       <div className="py-6 text-gray-700 font-medium text-lg">
                         You're on the list! We'll notify you when DiscoverFaro is available on iOS.
                       </div>
                     ) : (
                       <form onSubmit={(e) => { e.preventDefault(); setIosSubmitted(true); }} className="w-full space-y-4">
-                        <Input 
+                        <Input
                           required
-                          placeholder="First name" 
-                          className="h-12 rounded-xl border-gray-200 focus:border-sky-500 w-full text-base"
+                          placeholder="First name"
+                          className="h-12 rounded-xl border-gray-200 focus-visible:border-black focus-visible:ring-black focus-visible:ring-1 w-full text-base"
                         />
-                        <Input 
+                        <Input
                           required
                           type="email"
-                          placeholder="Email address" 
-                          className="h-12 rounded-xl border-gray-200 focus:border-sky-500 w-full text-base"
+                          placeholder="Email address"
+                          className="h-12 rounded-xl border-gray-200 focus-visible:border-black focus-visible:ring-black focus-visible:ring-1 w-full text-base"
                         />
                         <Button type="submit" className="w-full h-12 rounded-xl bg-black text-white font-bold text-base mt-2 hover:bg-gray-800 transition-colors">
                           Join Waitlist
@@ -529,23 +526,23 @@ export default function Home() {
                     <img src="/logos/google-play.png" alt="Google Play" className="h-12 w-12" />
                     <h3 className="text-2xl font-extrabold text-gray-900">Pre-order Android</h3>
                     <p className="text-gray-500 font-medium mb-2">Be the first to know when DiscoverFaro launches on Android!</p>
-                    
+
                     {androidSubmitted ? (
                       <div className="py-6 text-gray-700 font-medium text-lg">
                         You're on the list! We'll notify you when DiscoverFaro is available on Android.
                       </div>
                     ) : (
                       <form onSubmit={(e) => { e.preventDefault(); setAndroidSubmitted(true); }} className="w-full space-y-4">
-                        <Input 
+                        <Input
                           required
-                          placeholder="First name" 
-                          className="h-12 rounded-xl border-gray-200 focus:border-sky-500 w-full text-base"
+                          placeholder="First name"
+                          className="h-12 rounded-xl border-gray-200 focus-visible:border-black focus-visible:ring-black focus-visible:ring-1 w-full text-base"
                         />
-                        <Input 
+                        <Input
                           required
                           type="email"
-                          placeholder="Email address" 
-                          className="h-12 rounded-xl border-gray-200 focus:border-sky-500 w-full text-base"
+                          placeholder="Email address"
+                          className="h-12 rounded-xl border-gray-200 focus-visible:border-black focus-visible:ring-black focus-visible:ring-1 w-full text-base"
                         />
                         <Button type="submit" className="w-full h-12 rounded-xl bg-black text-white font-bold text-base mt-2 hover:bg-gray-800 transition-colors">
                           Join Waitlist
@@ -563,9 +560,9 @@ export default function Home() {
         <footer className="w-full relative z-10 py-6 border-t border-white/10 text-white/70 bg-transparent">
           <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="text-sm font-medium">
-              © 2026 by Logos Studio Inc. All rights reserved.
+              © 2026 by Studio DiscoverFaro. All rights reserved.
             </div>
-            
+
             <div className="flex items-center gap-6 text-sm font-medium">
               <a href="mailto:support@discoverfaro.com" className="hover:text-white transition-colors">Support</a>
               <a href="#" className="hover:text-white transition-colors">Terms & Conditions</a>
