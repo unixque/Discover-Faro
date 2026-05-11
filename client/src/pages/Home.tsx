@@ -388,6 +388,59 @@ const StickyFeaturesSection = () => {
   );
 };
 
+// Reusable Pre-order Form Component
+const PreOrderForm = ({
+  type,
+  submitted,
+  onSubmit
+}: {
+  type: 'ios' | 'android',
+  submitted: boolean,
+  onSubmit: () => void
+}) => {
+  const logo = type === 'ios' ? "/logos/apple.png" : "/logos/google-play.png";
+  const title = type === 'ios' ? "Pre-order iOS" : "Pre-order Android";
+  const description = type === 'ios'
+    ? "Be the first to know when DiscoverFaro launches on iOS!"
+    : "Be the first to know when DiscoverFaro launches on Android!";
+  const successMsg = type === 'ios'
+    ? "You're on the list! We'll notify you when DiscoverFaro is available on iOS."
+    : "You're on the list! We'll notify you when DiscoverFaro is available on Android.";
+
+  return (
+    <DialogContent className="sm:max-w-md text-center p-8 rounded-[2rem]" onOpenAutoFocus={(e) => e.preventDefault()}>
+      <div className="flex flex-col items-center gap-4">
+        <img src={logo} alt={type} className="h-12 w-12" />
+        <h3 className="text-2xl font-extrabold text-gray-900">{title}</h3>
+        <p className="text-gray-500 font-medium mb-2">{description}</p>
+
+        {submitted ? (
+          <div className="py-6 text-gray-700 font-medium text-lg">
+            {successMsg}
+          </div>
+        ) : (
+          <form onSubmit={(e) => { e.preventDefault(); onSubmit(); }} className="w-full space-y-4">
+            <Input
+              required
+              placeholder="First name"
+              className="h-12 rounded-xl border-gray-200 focus-visible:border-black focus-visible:ring-black focus-visible:ring-1 w-full text-base"
+            />
+            <Input
+              required
+              type="email"
+              placeholder="Email address"
+              className="h-12 rounded-xl border-gray-200 focus-visible:border-black focus-visible:ring-black focus-visible:ring-1 w-full text-base"
+            />
+            <Button type="submit" className="w-full h-12 rounded-xl bg-black text-white font-bold text-base mt-2 hover:bg-gray-800 transition-colors">
+              Join Waitlist
+            </Button>
+          </form>
+        )}
+      </div>
+    </DialogContent>
+  );
+};
+
 export default function Home() {
   const ctaRef = useScrollAnimation();
   const [iosSubmitted, setIosSubmitted] = useState(false);
@@ -427,22 +480,33 @@ export default function Home() {
 
             {/* Store Buttons - White pill style */}
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-8">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center justify-center gap-3 bg-white text-gray-900 font-bold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 w-[240px] h-16 px-6"
-              >
-                <img src="/logos/apple.png" alt="Apple" className="h-6 w-6" />
-                Pre-order iOS
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center justify-center gap-3 bg-white text-gray-900 font-bold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 w-[240px] h-16 px-6"
-              >
-                <img src="/logos/google-play.png" alt="Google Play" className="h-6 w-6" />
-                Pre-order Android
-              </motion.button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="inline-flex items-center justify-center gap-3 bg-white text-gray-900 font-bold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 w-[240px] h-16 px-6"
+                  >
+                    <img src="/logos/apple.png" alt="Apple" className="h-6 w-6" />
+                    Pre-order iOS
+                  </motion.button>
+                </DialogTrigger>
+                <PreOrderForm type="ios" submitted={iosSubmitted} onSubmit={() => setIosSubmitted(true)} />
+              </Dialog>
+
+              <Dialog>
+                <DialogTrigger asChild>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="inline-flex items-center justify-center gap-3 bg-white text-gray-900 font-bold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 w-[240px] h-16 px-6"
+                  >
+                    <img src="/logos/google-play.png" alt="Google Play" className="h-6 w-6" />
+                    Pre-order Android
+                  </motion.button>
+                </DialogTrigger>
+                <PreOrderForm type="android" submitted={androidSubmitted} onSubmit={() => setAndroidSubmitted(true)} />
+              </Dialog>
             </div>
           </motion.div>
         </motion.div>
@@ -485,36 +549,7 @@ export default function Home() {
                     Pre-order iOS
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-md text-center p-8 rounded-[2rem]">
-                  <div className="flex flex-col items-center gap-4">
-                    <img src="/logos/apple.png" alt="Apple" className="h-12 w-12" />
-                    <h3 className="text-2xl font-extrabold text-gray-900">Pre-order iOS</h3>
-                    <p className="text-gray-500 font-medium mb-2">Be the first to know when DiscoverFaro launches on iOS!</p>
-
-                    {iosSubmitted ? (
-                      <div className="py-6 text-gray-700 font-medium text-lg">
-                        You're on the list! We'll notify you when DiscoverFaro is available on iOS.
-                      </div>
-                    ) : (
-                      <form onSubmit={(e) => { e.preventDefault(); setIosSubmitted(true); }} className="w-full space-y-4">
-                        <Input
-                          required
-                          placeholder="First name"
-                          className="h-12 rounded-xl border-gray-200 focus-visible:border-black focus-visible:ring-black focus-visible:ring-1 w-full text-base"
-                        />
-                        <Input
-                          required
-                          type="email"
-                          placeholder="Email address"
-                          className="h-12 rounded-xl border-gray-200 focus-visible:border-black focus-visible:ring-black focus-visible:ring-1 w-full text-base"
-                        />
-                        <Button type="submit" className="w-full h-12 rounded-xl bg-black text-white font-bold text-base mt-2 hover:bg-gray-800 transition-colors">
-                          Join Waitlist
-                        </Button>
-                      </form>
-                    )}
-                  </div>
-                </DialogContent>
+                <PreOrderForm type="ios" submitted={iosSubmitted} onSubmit={() => setIosSubmitted(true)} />
               </Dialog>
 
               {/* Android Pre-order Modal */}
@@ -525,36 +560,7 @@ export default function Home() {
                     Pre-order Android
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-md text-center p-8 rounded-[2rem]">
-                  <div className="flex flex-col items-center gap-4">
-                    <img src="/logos/google-play.png" alt="Google Play" className="h-12 w-12" />
-                    <h3 className="text-2xl font-extrabold text-gray-900">Pre-order Android</h3>
-                    <p className="text-gray-500 font-medium mb-2">Be the first to know when DiscoverFaro launches on Android!</p>
-
-                    {androidSubmitted ? (
-                      <div className="py-6 text-gray-700 font-medium text-lg">
-                        You're on the list! We'll notify you when DiscoverFaro is available on Android.
-                      </div>
-                    ) : (
-                      <form onSubmit={(e) => { e.preventDefault(); setAndroidSubmitted(true); }} className="w-full space-y-4">
-                        <Input
-                          required
-                          placeholder="First name"
-                          className="h-12 rounded-xl border-gray-200 focus-visible:border-black focus-visible:ring-black focus-visible:ring-1 w-full text-base"
-                        />
-                        <Input
-                          required
-                          type="email"
-                          placeholder="Email address"
-                          className="h-12 rounded-xl border-gray-200 focus-visible:border-black focus-visible:ring-black focus-visible:ring-1 w-full text-base"
-                        />
-                        <Button type="submit" className="w-full h-12 rounded-xl bg-black text-white font-bold text-base mt-2 hover:bg-gray-800 transition-colors">
-                          Join Waitlist
-                        </Button>
-                      </form>
-                    )}
-                  </div>
-                </DialogContent>
+                <PreOrderForm type="android" submitted={androidSubmitted} onSubmit={() => setAndroidSubmitted(true)} />
               </Dialog>
             </div>
           </motion.div>
