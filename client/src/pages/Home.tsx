@@ -145,6 +145,7 @@ const stickyFeatures = [
     accentBg: "bg-sky-100",
     gradientFrom: "from-sky-50",
     gradientTo: "to-white",
+    textColor: "text-sky-600",
     number: "01",
   },
   {
@@ -160,6 +161,7 @@ const stickyFeatures = [
     accentBg: "bg-amber-100",
     gradientFrom: "from-amber-50",
     gradientTo: "to-white",
+    textColor: "text-amber-600",
     number: "02",
   },
   {
@@ -175,6 +177,7 @@ const stickyFeatures = [
     accentBg: "bg-emerald-100",
     gradientFrom: "from-emerald-50",
     gradientTo: "to-white",
+    textColor: "text-emerald-600",
     number: "03",
   },
   {
@@ -190,6 +193,7 @@ const stickyFeatures = [
     accentBg: "bg-pink-100",
     gradientFrom: "from-pink-50",
     gradientTo: "to-white",
+    textColor: "text-pink-600",
     number: "04",
   },
 ];
@@ -333,7 +337,7 @@ const StickyFeaturesSection = () => {
                         <div className="relative z-10 space-y-6">
                           {/* Icon */}
                           <motion.div
-                            className={`inline-flex p-4 ${feature.color} text-white rounded-2xl shadow-lg ${feature.shadowColor}`}
+                            className={`inline-flex ${feature.textColor}`}
                             initial={{ rotate: -10, scale: 0.8 }}
                             animate={{ rotate: 0, scale: 1 }}
                             transition={{
@@ -342,7 +346,7 @@ const StickyFeaturesSection = () => {
                               bounce: 0.5,
                             }}
                           >
-                            <feature.icon size={32} strokeWidth={2.2} />
+                            <feature.icon size={48} strokeWidth={2.2} />
                           </motion.div>
 
                           {/* Title */}
