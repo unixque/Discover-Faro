@@ -853,7 +853,7 @@ export default function Home() {
         </div>
 
         {/* Integrated Footer */}
-        <footer className="w-full relative z-10 py-20 border-t border-white/5 text-slate-500">
+        <footer className="w-full relative z-10 py-20 border-t border-white/5 text-white">
           <div className="container mx-auto px-6 max-w-6xl">
 
             {/* Redesigned Institutional Section */}
@@ -867,7 +867,7 @@ export default function Home() {
               <div className="space-y-4">
                 <h3 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
                   Developed within the framework of the <br className="hidden md:block" />
-                  <span className="text-slate-400 italic font-medium">"Faro Next Generation 2026" project</span>
+                  <span className="text-white/60 italic font-medium">"Faro Next Generation 2026" project</span>
                 </h3>
               </div>
 
@@ -879,7 +879,7 @@ export default function Home() {
                   <div className="h-16 md:h-20 transition-all duration-500 grayscale group-hover:grayscale-0 opacity-40 group-hover:opacity-100">
                     <img src="/cmFaro.png" alt="Municipality of Faro" className="h-full object-contain" />
                   </div>
-                  <span className="text-[9px] font-bold tracking-widest uppercase text-slate-600 group-hover:text-slate-400 transition-colors">Municipality of Faro</span>
+                  <span className="text-[9px] font-bold tracking-widest uppercase text-white/40 group-hover:text-white transition-colors">Municipality of Faro</span>
                 </motion.div>
 
                 <motion.div
@@ -889,7 +889,7 @@ export default function Home() {
                   <div className="h-12 md:h-16 transition-all duration-500 grayscale group-hover:grayscale-0 opacity-40 group-hover:opacity-100">
                     <img src="/dypall.png" alt="DYPALL Network" className="h-full object-contain" />
                   </div>
-                  <span className="text-[9px] font-bold tracking-widest uppercase text-slate-600 group-hover:text-slate-400 transition-colors">DYPALL Network</span>
+                  <span className="text-[9px] font-bold tracking-widest uppercase text-white/40 group-hover:text-white transition-colors">DYPALL Network</span>
                 </motion.div>
               </div>
             </motion.div>
@@ -902,14 +902,14 @@ export default function Home() {
                   </div>
                   <span className="text-2xl font-black text-white tracking-tighter">DiscoverFaro</span>
                 </div>
-                <div className="text-xs font-medium tracking-widest uppercase text-slate-600">
+                <div className="text-xs font-medium tracking-widest uppercase text-white/60">
                   © 2026 DiscoverFaro. All rights reserved.
                 </div>
               </div>
 
               <div className="flex items-center gap-10 text-[10px] font-bold tracking-widest uppercase">
                 {["Support", "Terms", "Privacy"].map(item => (
-                  <a key={item} href="#" className="hover:text-white transition-colors text-slate-500">{item}</a>
+                  <a key={item} href="#" className="hover:text-sky-300 transition-colors text-white/80">{item}</a>
                 ))}
               </div>
 
@@ -918,7 +918,7 @@ export default function Home() {
                   { name: "Instagram", path: "M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" },
                   { name: "TikTok", path: "M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-.88-.05A6.33 6.33 0 0 0 5.16 20.5a6.33 6.33 0 0 0 10.86-4.43V7.83a8.24 8.24 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.2-.26z" }
                 ].map(social => (
-                  <a key={social.name} href="#" className="text-slate-600 hover:text-white transition-colors transform hover:scale-110">
+                  <a key={social.name} href="#" className="text-white/40 hover:text-white transition-colors transform hover:scale-110">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                       <path d={social.path} />
                     </svg>
