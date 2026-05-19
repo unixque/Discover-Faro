@@ -4,6 +4,8 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { motion, useScroll, useTransform, useSpring, useMotionValueEvent, AnimatePresence } from "framer-motion";
 import { Download, Zap, MapPin, ArrowRight, MousePointerClick, Compass, Sparkles, Globe, Camera, Heart, Search, Eye, Info, Navigation, Flag, Share2, ExternalLink, Layers, Star, Utensils, Coffee, Umbrella } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { Link } from "wouter";
+import { toast } from "sonner";
 
 const useScrollAnimation = () => {
   const ref = useRef<HTMLDivElement>(null);
@@ -195,48 +197,178 @@ const stickyFeatures = [
 ];
 
 // Phone UI Content Components
-const AIScanScreen = () => (
-  <div className="flex flex-col h-full bg-slate-100 overflow-hidden relative">
-    <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1590001158193-790130ae8521?auto=format&fit=crop&w=800&q=80')] bg-cover bg-center grayscale-[0.2]" />
-    <div className="absolute inset-0 bg-black/10" />
-    <div className="absolute inset-0 grid grid-cols-4 grid-rows-6 pointer-events-none opacity-20">
-      {[...Array(24)].map((_, i) => (
-        <div key={i} className="border-[0.5px] border-white/40" />
-      ))}
-    </div>
-    <motion.div
-      className="absolute left-0 right-0 h-1 bg-sky-400 shadow-[0_0_15px_rgba(56,189,248,0.8)] z-10"
-      animate={{ top: ["0%", "100%", "0%"] }}
-      transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-    />
-    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 border-2 border-white/80 rounded-2xl">
-      <div className="absolute -top-1 -left-1 w-6 h-6 border-t-4 border-l-4 border-sky-400 rounded-tl-lg" />
-      <div className="absolute -top-1 -right-1 w-6 h-6 border-t-4 border-r-4 border-sky-400 rounded-tr-lg" />
-      <div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-4 border-l-4 border-sky-400 rounded-bl-lg" />
-      <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-4 border-r-4 border-sky-400 rounded-br-lg" />
-      <motion.div
-        className="absolute -top-12 left-0 right-0 text-center"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-      >
-        <span className="bg-sky-500 text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-widest">Identifying...</span>
-      </motion.div>
-    </div>
-    <div className="mt-auto p-4 relative z-20">
-      <div className="bg-white/90 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/20">
-        <h4 className="text-sm font-bold text-gray-900">Arco da Vila</h4>
-        <p className="text-[10px] text-gray-500 mt-1 line-clamp-2">Historic neoclassical gateway to the old city of Faro, built in 1812.</p>
-        <div className="flex gap-2 mt-2">
-          <div className="h-1 w-full bg-gray-100 rounded-full overflow-hidden">
-            <motion.div className="h-full bg-sky-500" animate={{ width: "85%" }} transition={{ duration: 1 }} />
+const AIScanScreen = () => {
+  const [monumentIndex, setMonumentIndex] = useState(0);
+  const [scanState, setScanState] = useState<'idle' | 'scanning' | 'success'>('idle');
+  const [imageError, setImageError] = useState(false);
+
+  const monuments = [
+    {
+      name: "Arco da Vila",
+      built: "1812",
+      image: "/arcovila.jpg",
+      description: "Historic neoclassical gateway to the old city of Faro, built by order of Bishop Francisco Gomes do Avelar.",
+      tip: "Look up to see the statue of Saint Thomas Aquinas in his niche."
+    },
+    {
+      name: "Sé de Faro (Cathedral)",
+      built: "1251",
+      image: "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=800&q=80",
+      description: "A monumental medieval cathedral combining Gothic, Renaissance, and Baroque architectural styles.",
+      tip: "Climb the tower for the absolute best panoramic view of the Ria Formosa."
+    },
+    {
+      name: "Igreja do Carmo",
+      built: "1719",
+      image: "https://images.unsplash.com/photo-1509840144275-4c47b0220050?auto=format&fit=crop&w=800&q=80",
+      description: "A stunning golden baroque church housing the famous Capela dos Ossos, constructed from the bones of over 1,000 monks.",
+      tip: "Enter the walled garden at the back to access the Bone Chapel."
+    }
+  ];
+
+  const handleScan = () => {
+    if (scanState === 'scanning') return;
+    setScanState('scanning');
+    
+    setTimeout(() => {
+      setScanState('success');
+    }, 1500);
+  };
+
+  const handleNext = () => {
+    setScanState('idle');
+    setImageError(false);
+    setMonumentIndex((prev) => (prev + 1) % monuments.length);
+  };
+
+  const active = monuments[monumentIndex];
+
+  return (
+    <div className="flex flex-col h-full bg-slate-900 overflow-hidden relative text-white font-sans">
+      {/* Background Image or Fallback */}
+      {!imageError ? (
+        <img 
+          src={active.image} 
+          alt={active.name}
+          onError={() => setImageError(true)}
+          className="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-in-out z-0 animate-fade-in" 
+        />
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-zinc-900 to-slate-950 flex flex-col items-center justify-center p-4 text-center z-0">
+          <div className="w-12 h-12 rounded-full bg-sky-500/10 border border-sky-400/20 flex items-center justify-center mb-2.5 animate-pulse">
+            <Camera className="text-sky-400" size={20} />
           </div>
-          <span className="text-[8px] font-bold text-sky-600">85%</span>
+          <span className="text-[9px] font-black uppercase tracking-widest text-sky-400">{active.name}</span>
+          <span className="text-[7px] text-zinc-400 mt-1 max-w-[150px] leading-normal font-medium">Spot preview active. Tap scan below to identify the monument.</span>
+        </div>
+      )}
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-[0.5px]" />
+
+      {/* Grid Overlay */}
+      <div className="absolute inset-0 grid grid-cols-4 grid-rows-6 pointer-events-none opacity-20">
+        {[...Array(24)].map((_, i) => (
+          <div key={i} className="border-[0.5px] border-white/20" />
+        ))}
+      </div>
+
+      {/* Scan Line Laser */}
+      {scanState === 'scanning' && (
+        <motion.div
+          className="absolute left-0 right-0 h-1 bg-sky-400 shadow-[0_0_15px_rgba(56,189,248,0.8)] z-20"
+          initial={{ top: "0%" }}
+          animate={{ top: ["0%", "100%", "0%"] }}
+          transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
+        />
+      )}
+
+      {/* Top Banner Navigation */}
+      <div className="absolute top-3 left-0 right-0 px-3 flex justify-between items-center z-30">
+        <span className="bg-black/60 backdrop-blur-md text-[8px] font-black tracking-widest uppercase py-1 px-2 rounded-full border border-white/10 flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          AI Scanner
+        </span>
+        <button 
+          onClick={handleNext}
+          className="bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-[8px] font-black tracking-widest uppercase py-1 px-2.5 rounded-full border border-white/10 backdrop-blur-md"
+        >
+          Next ➔
+        </button>
+      </div>
+
+      {/* Target Focus Finder Box */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 border border-white/20 rounded-2xl flex items-center justify-center">
+        <div className={`absolute -top-0.5 -left-0.5 w-4 h-4 border-t-2 border-l-2 rounded-tl transition-colors duration-300 ${scanState === 'scanning' ? 'border-sky-400' : scanState === 'success' ? 'border-emerald-400' : 'border-white/60'}`} />
+        <div className={`absolute -top-0.5 -right-0.5 w-4 h-4 border-t-2 border-r-2 rounded-tr transition-colors duration-300 ${scanState === 'scanning' ? 'border-sky-400' : scanState === 'success' ? 'border-emerald-400' : 'border-white/60'}`} />
+        <div className={`absolute -bottom-0.5 -left-0.5 w-4 h-4 border-b-2 border-l-2 rounded-bl transition-colors duration-300 ${scanState === 'scanning' ? 'border-sky-400' : scanState === 'success' ? 'border-emerald-400' : 'border-white/60'}`} />
+        <div className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 border-b-2 border-r-2 rounded-br transition-colors duration-300 ${scanState === 'scanning' ? 'border-sky-400' : scanState === 'success' ? 'border-emerald-400' : 'border-white/60'}`} />
+
+        <div className="text-center pointer-events-none">
+          {scanState === 'idle' && (
+            <span className="text-[8px] font-bold tracking-wider bg-black/60 py-0.5 px-2 rounded-full text-white/90">Ready</span>
+          )}
+          {scanState === 'scanning' && (
+            <span className="text-[8px] font-bold tracking-wider text-sky-400 animate-pulse bg-sky-950/80 border border-sky-500/20 py-0.5 px-2 rounded-full">Scanning...</span>
+          )}
+          {scanState === 'success' && (
+            <span className="text-[8px] font-bold tracking-wider text-emerald-400 bg-emerald-950/80 border border-emerald-500/20 py-0.5 px-2 rounded-full">Matched</span>
+          )}
         </div>
       </div>
+
+      {/* Interactive Scan Trigger Action / Result Slide-up */}
+      <div className="mt-auto p-3 relative z-30 w-full">
+        {scanState !== 'success' ? (
+          <button
+            onClick={handleScan}
+            disabled={scanState === 'scanning'}
+            className={`w-full py-2.5 px-4 rounded-xl text-[9px] font-black tracking-widest uppercase transition-all duration-300 shadow-xl border flex items-center justify-center gap-1.5 ${scanState === 'scanning' ? 'bg-zinc-800 border-zinc-700 text-zinc-500' : 'bg-sky-500 hover:bg-sky-400 border-sky-400 text-white active:scale-98'}`}
+          >
+            {scanState === 'scanning' ? (
+              <>
+                <span className="w-3 h-3 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
+                Scanning...
+              </>
+            ) : (
+              <>
+                <Camera size={12} />
+                Tap to Scan
+              </>
+            )}
+          </button>
+        ) : (
+          <motion.div 
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="bg-slate-900/95 border border-white/10 backdrop-blur-md rounded-xl p-3 shadow-2xl flex flex-col text-left space-y-2"
+          >
+            <div>
+              <div className="flex justify-between items-start">
+                <h4 className="text-[11px] font-black text-white">{active.name}</h4>
+                <span className="text-[7px] font-bold tracking-widest text-emerald-400 bg-emerald-950/50 py-0.5 px-1.5 rounded border border-emerald-500/20">EST. {active.built}</span>
+              </div>
+              <p className="text-[8px] text-zinc-400 mt-0.5 leading-normal font-medium">{active.description}</p>
+            </div>
+            
+            <div className="bg-sky-500/10 border border-sky-400/20 rounded-lg p-1.5 flex items-start gap-1">
+              <Sparkles size={10} className="text-sky-400 shrink-0 mt-0.5" />
+              <div className="flex flex-col">
+                <span className="text-[6px] font-black uppercase tracking-widest text-sky-400">Local AI Tip</span>
+                <span className="text-[8px] text-sky-200 mt-0.5 leading-normal font-medium">{active.tip}</span>
+              </div>
+            </div>
+
+            <button 
+              onClick={() => setScanState('idle')}
+              className="w-full py-1 bg-white/5 hover:bg-white/10 rounded border border-white/5 text-[7px] font-black tracking-widest uppercase transition-all duration-200"
+            >
+              Scan Again
+            </button>
+          </motion.div>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const RoutePlannerScreen = () => (
   <div className="flex flex-col h-full bg-slate-50 relative overflow-hidden">
@@ -358,6 +490,18 @@ const TipsScreen = () => (
 const StickyFeaturesSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const [activeFeature, setActiveFeature] = useState(0);
+  const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const x = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+      const y = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+      setMouseOffset({ x, y });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -471,6 +615,8 @@ const StickyFeaturesSection = () => {
                         height: 50 + (i * 12),
                         top: `${10 + (i * 15)}%`,
                         left: i % 2 === 0 ? `${-8 + (i * 4)}%` : `${82 - (i * 4)}%`,
+                        transform: `translate(${mouseOffset.x * (15 + i * 8)}px, ${mouseOffset.y * (15 + i * 8)}px)`,
+                        transition: "transform 0.2s cubic-bezier(0.25, 1, 0.5, 1)"
                       }}
                       animate={{ y: [0, -30, 0], rotate: [0, 15, -15, 0] }}
                       transition={{ duration: 5 + i, repeat: Infinity, delay: i * 0.5 }}
@@ -649,6 +795,8 @@ const StarField = () => (
   </div>
 );
 
+const GOOGLE_SHEETS_WEBHOOK_URL = ""; // Paste your deployed Web App URL here
+
 const PreOrderForm = ({
   type,
   submitted,
@@ -658,6 +806,10 @@ const PreOrderForm = ({
   submitted: boolean,
   onSubmit: () => void
 }) => {
+  const [firstName, setFirstName] = useState("");
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const logo = type === 'ios' ? "/logos/apple.png" : "/logos/google-play.png";
   const title = type === 'ios' ? "Pre-order iOS" : "Pre-order Android";
   const description = type === 'ios'
@@ -666,6 +818,41 @@ const PreOrderForm = ({
   const successMsg = type === 'ios'
     ? "You're on the list! We'll notify you when DiscoverFaro is available on iOS."
     : "You're on the list! We'll notify you when DiscoverFaro is available on Android.";
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const webhookUrl = import.meta.env.VITE_GOOGLE_SHEETS_WEBHOOK_URL || GOOGLE_SHEETS_WEBHOOK_URL;
+
+    if (!webhookUrl) {
+      console.warn("Google Sheets Webhook URL not configured. Submitting locally (simulation).");
+      onSubmit();
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await fetch(webhookUrl, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          firstName,
+          email,
+          platform: type,
+          timestamp: new Date().toISOString()
+        })
+      });
+      onSubmit();
+    } catch (err) {
+      console.error("Waitlist submission error:", err);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <DialogContent className="sm:max-w-md text-center p-8 rounded-[2rem]" onOpenAutoFocus={(e) => e.preventDefault()}>
@@ -679,20 +866,30 @@ const PreOrderForm = ({
             {successMsg}
           </div>
         ) : (
-          <form onSubmit={(e) => { e.preventDefault(); onSubmit(); }} className="w-full space-y-4">
+          <form onSubmit={handleSubmit} className="w-full space-y-4">
             <Input
               required
               placeholder="First name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              disabled={loading}
               className="h-12 rounded-xl border-gray-200 focus-visible:border-black focus-visible:ring-black focus-visible:ring-1 w-full text-base"
             />
             <Input
               required
               type="email"
               placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
               className="h-12 rounded-xl border-gray-200 focus-visible:border-black focus-visible:ring-black focus-visible:ring-1 w-full text-base"
             />
-            <Button type="submit" className="w-full h-12 rounded-xl bg-black text-white font-bold text-base mt-2 hover:bg-gray-800 transition-colors">
-              Join Waitlist
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full h-12 rounded-xl bg-black text-white font-bold text-base mt-2 hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+            >
+              {loading ? "Joining..." : "Join Waitlist"}
             </Button>
           </form>
         )}
@@ -846,7 +1043,7 @@ export default function Home() {
                     <span>Pre-order Android</span>
                   </motion.button>
                 </DialogTrigger>
-                <PreOrderForm type="android" submitted={androidSubmitted} onSubmit={() => setIosSubmitted(true)} />
+                <PreOrderForm type="android" submitted={androidSubmitted} onSubmit={() => setAndroidSubmitted(true)} />
               </Dialog>
             </div>
           </motion.div>
@@ -865,14 +1062,19 @@ export default function Home() {
               className="flex flex-col items-center text-center space-y-12 mb-24"
             >
               <div className="space-y-4">
-                <h3 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
-                  Developed within the framework of the <br className="hidden md:block" />
-                  <span className="text-white/60 italic font-medium">"Faro Next Generation 2026" project</span>
+                <h3 className="text-2xl md:text-3xl font-medium text-white/40 tracking-tight">
+                  Developed for the <br className="hidden md:block" />
+                  <span className="text-white font-black">Faro Next Generation 2026</span>{" "}
+                  <span className="text-white/40 font-medium">competition</span>
                 </h3>
               </div>
 
               <div className="flex flex-wrap items-center justify-center gap-16 md:gap-24">
                 <motion.div
+                  initial={{ opacity: 0, y: 25 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: 0.1, ease: [0.21, 1, 0.36, 1] }}
                   whileHover={{ y: -5 }}
                   className="flex flex-col items-center gap-4 group"
                 >
@@ -883,6 +1085,10 @@ export default function Home() {
                 </motion.div>
 
                 <motion.div
+                  initial={{ opacity: 0, y: 25 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: 0.25, ease: [0.21, 1, 0.36, 1] }}
                   whileHover={{ y: -5 }}
                   className="flex flex-col items-center gap-4 group"
                 >
@@ -903,14 +1109,14 @@ export default function Home() {
                   <span className="text-2xl font-black text-white tracking-tighter">DiscoverFaro</span>
                 </div>
                 <div className="text-xs font-medium tracking-widest uppercase text-white/60">
-                  © 2026 DiscoverFaro. All rights reserved.
+                  © 2026 DiscoverFaro.
                 </div>
               </div>
 
               <div className="flex items-center gap-10 text-[10px] font-bold tracking-widest uppercase">
-                {["Support", "Terms", "Privacy"].map(item => (
-                  <a key={item} href="#" className="hover:text-sky-300 transition-colors text-white/80">{item}</a>
-                ))}
+                <a href="mailto:al35126@agr-tc.pt" className="hover:text-sky-300 transition-colors text-white/80">Support</a>
+                <Link href="/terms" className="hover:text-sky-300 transition-colors text-white/80">Terms</Link>
+                <Link href="/privacy" className="hover:text-sky-300 transition-colors text-white/80">Privacy</Link>
               </div>
 
               <div className="flex items-center gap-6">
