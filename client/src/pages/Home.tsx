@@ -1,9 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { motion, useScroll, useTransform, useSpring, useMotionValueEvent, AnimatePresence } from "framer-motion";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from "@/components/ui/carousel";
+import { motion, useScroll, useTransform, useMotionValueEvent, AnimatePresence } from "framer-motion";
 import { Download, Zap, MapPin, ArrowRight, MousePointerClick, Compass, Sparkles, Globe, Camera, Heart, Search, Eye, Info, Navigation, Flag, Share2, ExternalLink, Layers, Star, Utensils, Coffee, Umbrella } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { useIsMobile } from "@/hooks/useMobile";
 import { Link } from "wouter";
 import { toast } from "sonner";
 
@@ -486,8 +493,123 @@ const TipsScreen = () => (
   </div>
 );
 
-// Immersive Scroll Features Section
-const StickyFeaturesSection = () => {
+const FeaturePhoneScreens = ({ activeFeature }: { activeFeature: number }) => (
+  <>
+    {activeFeature === 0 && <AIScanScreen />}
+    {activeFeature === 1 && <RoutePlannerScreen />}
+    {activeFeature === 2 && <MapsIntegrationScreen />}
+    {activeFeature === 3 && <TipsScreen />}
+  </>
+);
+
+const MobileFeaturesCarousel = () => {
+  const [activeFeature, setActiveFeature] = useState(0);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+
+  useEffect(() => {
+    if (!carouselApi) return;
+
+    const onSelect = () => {
+      setActiveFeature(carouselApi.selectedScrollSnap());
+    };
+
+    onSelect();
+    carouselApi.on("select", onSelect);
+    return () => {
+      carouselApi.off("select", onSelect);
+    };
+  }, [carouselApi]);
+
+  const currentAurora = stickyFeatures[activeFeature].aurora;
+
+  return (
+    <section
+      id="features"
+      className="relative overflow-hidden py-8 min-h-[85dvh] flex flex-col justify-center"
+      style={{
+        "--aurora-1": currentAurora[1],
+        "--aurora-2": currentAurora[2],
+        "--aurora-3": currentAurora[3],
+        "--aurora-4": currentAurora[4],
+      } as React.CSSProperties}
+    >
+      <div className="absolute inset-0 aurora-bg z-0 pointer-events-none" />
+
+      <div className="container mx-auto px-4 relative z-10 flex flex-col gap-5">
+        <h2 className="text-3xl font-black text-gray-900 tracking-tighter leading-tight text-center">
+          Everything{" "}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-500 to-pink-500">
+            you need
+          </span>
+        </h2>
+
+        <Carousel
+          setApi={setCarouselApi}
+          opts={{ align: "center", loop: false }}
+          className="w-full"
+        >
+          <CarouselContent className="ml-0">
+            {stickyFeatures.map((feature, idx) => (
+              <CarouselItem key={idx} className="pl-0 basis-full">
+                <div className="flex flex-col items-center px-2">
+                  <div className="flex flex-col items-center text-center gap-3 min-h-[140px]">
+                    <div
+                      className={`w-10 h-10 flex items-center justify-center rounded-xl bg-white/60 backdrop-blur-xl border border-white/80 shadow-sm ${feature.color}`}
+                    >
+                      <feature.icon size={22} strokeWidth={2.5} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-black text-gray-900">{feature.title}</h3>
+                      <p className="text-sm text-gray-600 mt-1.5 font-medium leading-snug max-w-[280px] mx-auto">
+                        {feature.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div
+                    className="flex justify-center gap-2 my-4 w-full"
+                    role="tablist"
+                    aria-label="Features"
+                  >
+                    {stickyFeatures.map((_, dotIdx) => (
+                      <button
+                        key={dotIdx}
+                        type="button"
+                        role="tab"
+                        aria-selected={activeFeature === dotIdx}
+                        aria-label={`Feature ${dotIdx + 1}`}
+                        onClick={() => carouselApi?.scrollTo(dotIdx)}
+                        className={`h-1.5 rounded-full transition-all duration-300 ${
+                          activeFeature === dotIdx
+                            ? "w-6 bg-gradient-to-r from-sky-500 to-pink-500"
+                            : "w-3 bg-gray-200"
+                        }`}
+                      />
+                    ))}
+                  </div>
+
+                  <div className="flex justify-center items-center relative h-auto pb-2">
+                    <div
+                      className={`absolute w-[220px] h-[220px] rounded-full blur-[80px] opacity-30 -z-10 ${feature.color}`}
+                    />
+                    <div className="phone-mockup phone-mockup--compact z-10">
+                      <div className="phone-notch" />
+                      <div className="phone-screen">
+                        <FeaturePhoneScreens activeFeature={idx} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
+      </div>
+    </section>
+  );
+};
+
+const DesktopStickyFeatures = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const [activeFeature, setActiveFeature] = useState(0);
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
@@ -507,11 +629,6 @@ const StickyFeaturesSection = () => {
     target: sectionRef,
     offset: ["start start", "end end"],
   });
-
-  const progressHeight = useSpring(
-    useTransform(scrollYProgress, [0, 1], [0, 100]),
-    { stiffness: 100, damping: 30 }
-  );
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     const featureCount = stickyFeatures.length;
@@ -537,9 +654,7 @@ const StickyFeaturesSection = () => {
         "--aurora-4": currentAurora[4],
       } as React.CSSProperties}
     >
-      {/* Sticky Container - This pins everything to the viewport */}
       <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden">
-        {/* Dynamic Background - Now pinned with the container */}
         <div className="absolute inset-0 aurora-bg z-0 pointer-events-none" />
 
         <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center relative z-10">
@@ -647,10 +762,7 @@ const StickyFeaturesSection = () => {
                     exit={{ y: "-100%", opacity: 0 }}
                     transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                   >
-                    {activeFeature === 0 && <AIScanScreen />}
-                    {activeFeature === 1 && <RoutePlannerScreen />}
-                    {activeFeature === 2 && <MapsIntegrationScreen />}
-                    {activeFeature === 3 && <TipsScreen />}
+                    <FeaturePhoneScreens activeFeature={activeFeature} />
                   </motion.div>
                 </AnimatePresence>
               </div>
@@ -663,6 +775,11 @@ const StickyFeaturesSection = () => {
       </div>
     </section>
   );
+};
+
+const StickyFeaturesSection = () => {
+  const isMobile = useIsMobile();
+  return isMobile ? <MobileFeaturesCarousel /> : <DesktopStickyFeatures />;
 };
 
 // Reusable Pre-order Form Component
@@ -728,26 +845,26 @@ const Navbar = () => {
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed top-0 left-0 right-0 z-[100] flex justify-center p-6 pointer-events-none"
+      className="fixed top-0 left-0 right-0 z-[100] flex justify-center p-3 md:p-4 pointer-events-none"
     >
       <div className={`
         flex items-center justify-between pointer-events-auto transition-all duration-700 ease-[0.22,1,0.36,1]
         ${isScrolled
-          ? "bg-gray-950/80 backdrop-blur-3xl border border-white/10 px-6 py-2.5 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.3)] w-full max-w-[500px]"
-          : "bg-white/10 backdrop-blur-2xl border border-white/20 px-8 py-4 rounded-[2rem] shadow-2xl w-full max-w-7xl"
+          ? "bg-gray-950/80 backdrop-blur-3xl border border-white/10 px-5 py-2 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.3)] w-full max-w-[500px]"
+          : "bg-white/10 backdrop-blur-2xl border border-white/20 px-5 md:px-6 py-2 md:py-2.5 rounded-[1.5rem] shadow-2xl w-full max-w-7xl"
         }
       `}>
         <div
-          className="flex items-center gap-3 cursor-pointer group"
+          className="flex items-center gap-2 md:gap-3 cursor-pointer group"
           onClick={scrollToTop}
         >
-          <div className={`transition-all duration-700 flex items-center justify-center overflow-hidden ${isScrolled ? "w-8 h-8" : "w-12 h-12"}`}>
+          <div className={`transition-all duration-700 flex items-center justify-center overflow-hidden ${isScrolled ? "w-7 h-7" : "w-9 h-9"}`}>
             <img src="/Logonbg2.png" alt="DiscoverFaro" className="w-full h-full object-contain" />
           </div>
-          <span className={`font-black text-white tracking-tighter transition-all duration-700 ${isScrolled ? "text-base" : "text-xl"}`}>DiscoverFaro</span>
+          <span className={`font-black text-white tracking-tighter transition-all duration-700 ${isScrolled ? "text-sm" : "text-base md:text-lg"}`}>DiscoverFaro</span>
         </div>
 
-        <div className={`hidden md:flex items-center transition-all duration-700 ${isScrolled ? "gap-6" : "gap-10"}`}>
+        <div className={`hidden md:flex items-center transition-all duration-700 ${isScrolled ? "gap-5" : "gap-8"}`}>
           {["Features", "Waitlist"].map((item) => (
             <a
               key={item}
@@ -761,7 +878,7 @@ const Navbar = () => {
 
         <Button
           onClick={scrollToWaitlist}
-          className={`rounded-full bg-white text-gray-900 font-bold transition-all duration-700 hover:bg-sky-50 shadow-lg border-none ${isScrolled ? "px-4 h-8 text-[10px]" : "px-6 h-11 text-sm"}`}
+          className={`rounded-full bg-white text-gray-900 font-bold transition-all duration-700 hover:bg-sky-50 shadow-lg border-none ${isScrolled ? "px-4 h-7 text-[10px]" : "px-5 h-9 text-xs md:text-sm"}`}
         >
           Waitlist
         </Button>
@@ -913,7 +1030,7 @@ export default function Home() {
       <Navbar />
 
       {/* Hero Section (Roamy Style) */}
-      <section className="relative min-h-[110svh] flex items-center justify-center overflow-hidden roamy-sky-bg pt-24 pb-48">
+      <section className="relative min-h-[110svh] flex items-start md:items-center justify-center overflow-hidden roamy-sky-bg pt-32 md:pt-36 pb-48">
         {/* Sky Enhancements */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-white/20 blur-[120px] rounded-full pointer-events-none" />
@@ -929,7 +1046,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, type: "spring", bounce: 0.3 }}
-            className="space-y-10 max-w-4xl mx-auto"
+            className="space-y-10 max-w-4xl mx-auto mt-4 md:mt-6"
           >
             <div className="space-y-2">
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white leading-[0.9] tracking-tighter drop-shadow-2xl">
@@ -1070,33 +1187,41 @@ export default function Home() {
               </div>
 
               <div className="flex flex-wrap items-center justify-center gap-16 md:gap-24">
-                <motion.div
+                <motion.a
+                  href="https://www.cm-faro.pt/pt/Default.aspx"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   initial={{ opacity: 0, y: 25 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.8, delay: 0.1, ease: [0.21, 1, 0.36, 1] }}
                   whileHover={{ y: -5 }}
-                  className="flex flex-col items-center gap-4 group"
+                  className="flex flex-col items-center gap-4 group cursor-pointer"
+                  aria-label="Municipality of Faro website"
                 >
                   <div className="h-16 md:h-20 transition-all duration-500 grayscale group-hover:grayscale-0 opacity-40 group-hover:opacity-100">
                     <img src="/cmFaro.png" alt="Municipality of Faro" className="h-full object-contain" />
                   </div>
                   <span className="text-[9px] font-bold tracking-widest uppercase text-white/40 group-hover:text-white transition-colors">Municipality of Faro</span>
-                </motion.div>
+                </motion.a>
 
-                <motion.div
+                <motion.a
+                  href="https://dypall.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   initial={{ opacity: 0, y: 25 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.8, delay: 0.25, ease: [0.21, 1, 0.36, 1] }}
                   whileHover={{ y: -5 }}
-                  className="flex flex-col items-center gap-4 group"
+                  className="flex flex-col items-center gap-4 group cursor-pointer"
+                  aria-label="DYPALL Network website"
                 >
                   <div className="h-12 md:h-16 transition-all duration-500 grayscale group-hover:grayscale-0 opacity-40 group-hover:opacity-100">
                     <img src="/dypall.png" alt="DYPALL Network" className="h-full object-contain" />
                   </div>
                   <span className="text-[9px] font-bold tracking-widest uppercase text-white/40 group-hover:text-white transition-colors">DYPALL Network</span>
-                </motion.div>
+                </motion.a>
               </div>
             </motion.div>
 
