@@ -377,9 +377,20 @@ const AIScanScreen = () => {
   );
 };
 
-const RoutePlannerScreen = () => (
+const RoutePlannerScreen = ({ isActive = true }: { isActive?: boolean }) => {
+  const [animKey, setAnimKey] = useState(0);
+
+  useEffect(() => {
+    if (isActive) setAnimKey((k) => k + 1);
+  }, [isActive]);
+
+  return (
   <div className="flex flex-col h-full bg-slate-50 relative overflow-hidden">
-    <div className="absolute inset-0 bg-[#f8fafc] opacity-50">
+    <motion.div
+      className="absolute inset-0 bg-[#f8fafc] opacity-50 scale-110"
+      animate={isActive ? { x: [0, -6, 0], y: [0, -4, 0] } : { x: 0, y: 0 }}
+      transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+    >
       <svg className="w-full h-full opacity-20" viewBox="0 0 100 100" preserveAspectRatio="none">
         <path d="M0 20 Q 25 25 50 20 T 100 25 V 100 H 0 Z" fill="#e2e8f0" />
         <path d="M0 40 Q 25 45 50 40 T 100 45 V 100 H 0 Z" fill="#cbd5e1" />
@@ -389,20 +400,35 @@ const RoutePlannerScreen = () => (
         <line x1="70" y1="0" x2="70" y2="100" stroke="#cbd5e1" strokeWidth="0.5" />
         <line x1="90" y1="0" x2="90" y2="100" stroke="#cbd5e1" strokeWidth="0.5" />
       </svg>
-    </div>
+    </motion.div>
     <svg className="absolute inset-0 w-full h-full z-10" viewBox="0 0 200 400">
       <motion.path
+        key={`route-${animKey}`}
         d="M 40 320 C 60 280, 140 240, 100 180 S 160 100, 150 60"
         fill="transparent"
         stroke="#fbbf24"
         strokeWidth="6"
         strokeLinecap="round"
         initial={{ pathLength: 0 }}
-        animate={{ pathLength: 1 }}
+        animate={{ pathLength: isActive ? 1 : 0 }}
         transition={{ duration: 2, ease: "easeInOut" }}
       />
-      <motion.circle cx="40" cy="320" r="6" fill="#fbbf24" animate={{ r: [6, 10, 6] }} transition={{ repeat: Infinity, duration: 2 }} />
-      <motion.circle cx="150" cy="60" r="6" fill="#fbbf24" />
+      <motion.circle
+        cx="40"
+        cy="320"
+        r="6"
+        fill="#fbbf24"
+        animate={isActive ? { r: [6, 10, 6] } : { r: 6 }}
+        transition={{ repeat: Infinity, duration: 2 }}
+      />
+      <motion.circle
+        cx="150"
+        cy="60"
+        r="6"
+        fill="#fbbf24"
+        animate={isActive ? { r: [6, 9, 6], opacity: [1, 0.75, 1] } : { r: 6 }}
+        transition={{ repeat: Infinity, duration: 1.5 }}
+      />
     </svg>
     <div className="p-4 relative z-20">
       <div className="bg-white rounded-xl p-3 shadow-md border border-gray-100 flex items-center gap-3">
@@ -425,7 +451,8 @@ const RoutePlannerScreen = () => (
       </div>
     </div>
   </div>
-);
+  );
+};
 
 const MapsIntegrationScreen = () => (
   <div className="flex flex-col h-full bg-white relative overflow-hidden">
@@ -493,10 +520,16 @@ const TipsScreen = () => (
   </div>
 );
 
-const FeaturePhoneScreens = ({ activeFeature }: { activeFeature: number }) => (
+const FeaturePhoneScreens = ({
+  activeFeature,
+  isActive = true,
+}: {
+  activeFeature: number;
+  isActive?: boolean;
+}) => (
   <>
     {activeFeature === 0 && <AIScanScreen />}
-    {activeFeature === 1 && <RoutePlannerScreen />}
+    {activeFeature === 1 && <RoutePlannerScreen isActive={isActive} />}
     {activeFeature === 2 && <MapsIntegrationScreen />}
     {activeFeature === 3 && <TipsScreen />}
   </>
@@ -595,7 +628,7 @@ const MobileFeaturesCarousel = () => {
                     <div className="phone-mockup phone-mockup--compact z-10">
                       <div className="phone-notch" />
                       <div className="phone-screen">
-                        <FeaturePhoneScreens activeFeature={idx} />
+                        <FeaturePhoneScreens activeFeature={idx} isActive={activeFeature === idx} />
                       </div>
                     </div>
                   </div>
@@ -762,7 +795,7 @@ const DesktopStickyFeatures = () => {
                     exit={{ y: "-100%", opacity: 0 }}
                     transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                   >
-                    <FeaturePhoneScreens activeFeature={activeFeature} />
+                    <FeaturePhoneScreens activeFeature={activeFeature} isActive />
                   </motion.div>
                 </AnimatePresence>
               </div>
