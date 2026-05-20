@@ -1030,7 +1030,7 @@ export default function Home() {
       <Navbar />
 
       {/* Hero Section (Roamy Style) */}
-      <section className="relative min-h-[110svh] flex items-start md:items-center justify-center overflow-hidden roamy-sky-bg pt-32 md:pt-36 pb-48">
+      <section className="relative min-h-[110svh] flex items-start md:items-center justify-center overflow-hidden roamy-sky-bg pt-28 md:pt-32 pb-48">
         {/* Sky Enhancements */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-white/20 blur-[120px] rounded-full pointer-events-none" />
@@ -1046,7 +1046,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, type: "spring", bounce: 0.3 }}
-            className="space-y-10 max-w-4xl mx-auto mt-4 md:mt-6"
+            className="space-y-10 max-w-4xl mx-auto mt-2 md:mt-3"
           >
             <div className="space-y-2">
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white leading-[0.9] tracking-tighter drop-shadow-2xl">
