@@ -7,8 +7,8 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { motion, useScroll, useTransform, useMotionValueEvent, AnimatePresence } from "framer-motion";
-import { Download, Zap, MapPin, ArrowRight, MousePointerClick, Compass, Sparkles, Globe, Camera, Heart, Search, Eye, Info, Navigation, Flag, Share2, ExternalLink, Layers, Star, Utensils, Coffee, Umbrella } from "lucide-react";
+import { motion, useScroll, useTransform, useSpring, useMotionValueEvent, AnimatePresence } from "framer-motion";
+import { Download, Zap, MapPin, ArrowRight, MousePointerClick, Compass, Sparkles, Globe, Camera, Heart, Search, Eye, Info, Navigation, Flag, Share2, ExternalLink, Layers, Star, Utensils, Coffee, Umbrella, Play, Pause, Sun, Wind, Volume2, Music, Plus, Mic, ArrowUp, Calendar, User, Map } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useIsMobile } from "@/hooks/useMobile";
 import { Link } from "wouter";
@@ -139,681 +139,10 @@ const InteractiveSkyBackground = () => {
   );
 };
 
-// Feature data for sticky scroll section
-const stickyFeatures = [
-  {
-    icon: Camera,
-    title: "AI Scan & Discover",
-    description: "Snap a photo of any monument. Our AI identifies it instantly, sharing the history and soul of Faro directly to your screen.",
-    color: "text-sky-500",
-    aurora: {
-      1: "rgba(14, 165, 233, 0.2)",
-      2: "rgba(236, 72, 153, 0.15)",
-      3: "rgba(255, 255, 255, 0.8)",
-      4: "rgba(224, 242, 254, 0.5)",
-    },
-    textColor: "text-sky-600",
-    number: "01",
-    floatingIcons: [Camera, Search, Eye, Info, Zap, Sparkles]
-  },
-  {
-    icon: Compass,
-    title: "Smart Route Planner",
-    description: "Tell us your mood. We build an optimized, day-by-day itinerary that adjusts to Faro's real-time events and weather.",
-    color: "text-amber-500",
-    aurora: {
-      1: "rgba(251, 191, 36, 0.2)",
-      2: "rgba(16, 185, 129, 0.15)",
-      3: "rgba(255, 255, 255, 0.8)",
-      4: "rgba(254, 252, 232, 0.5)",
-    },
-    textColor: "text-amber-600",
-    number: "02",
-    floatingIcons: [Compass, Navigation, Flag, MapPin, Zap, MousePointerClick]
-  },
-  {
-    icon: MapPin,
-    title: "Maps Integration",
-    description: "Seamlessly open your routes in Google Maps or Apple Maps. Real-time navigation for Faro's narrowest streets.",
-    color: "text-emerald-500",
-    aurora: {
-      1: "rgba(16, 185, 129, 0.2)",
-      2: "rgba(14, 165, 233, 0.15)",
-      3: "rgba(255, 255, 255, 0.8)",
-      4: "rgba(236, 253, 245, 0.5)",
-    },
-    textColor: "text-emerald-600",
-    number: "03",
-    floatingIcons: [Globe, Share2, ExternalLink, MapPin, Layers, Compass]
-  },
-  {
-    icon: Heart,
-    title: "Personalized Tips",
-    description: "From the best pastel de nata to hidden beaches — our AI learns your style and curates hidden gems just for you.",
-    color: "text-pink-500",
-    aurora: {
-      1: "rgba(236, 72, 153, 0.2)",
-      2: "rgba(14, 165, 233, 0.15)",
-      3: "rgba(255, 255, 255, 0.8)",
-      4: "rgba(253, 242, 248, 0.5)",
-    },
-    textColor: "text-pink-600",
-    number: "04",
-    floatingIcons: [Heart, Star, Utensils, Coffee, Umbrella, Sparkles]
-  },
-];
 
-// Phone UI Content Components
-const AIScanScreen = () => {
-  const [monumentIndex, setMonumentIndex] = useState(0);
-  const [scanState, setScanState] = useState<'idle' | 'scanning' | 'success'>('idle');
-  const [imageError, setImageError] = useState(false);
+// Unused Sticky scroll components removed to streamline performance
 
-  const monuments = [
-    {
-      name: "Arco da Vila",
-      built: "1812",
-      image: "/arcovila.jpg",
-      description: "Historic neoclassical gateway to the old city of Faro, built by order of Bishop Francisco Gomes do Avelar.",
-      tip: "Look up to see the statue of Saint Thomas Aquinas in his niche."
-    },
-    {
-      name: "Sé de Faro (Cathedral)",
-      built: "1251",
-      image: "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=800&q=80",
-      description: "A monumental medieval cathedral combining Gothic, Renaissance, and Baroque architectural styles.",
-      tip: "Climb the tower for the absolute best panoramic view of the Ria Formosa."
-    },
-    {
-      name: "Igreja do Carmo",
-      built: "1719",
-      image: "https://images.unsplash.com/photo-1509840144275-4c47b0220050?auto=format&fit=crop&w=800&q=80",
-      description: "A stunning golden baroque church housing the famous Capela dos Ossos, constructed from the bones of over 1,000 monks.",
-      tip: "Enter the walled garden at the back to access the Bone Chapel."
-    }
-  ];
 
-  const handleScan = () => {
-    if (scanState === 'scanning') return;
-    setScanState('scanning');
-    
-    setTimeout(() => {
-      setScanState('success');
-    }, 1500);
-  };
-
-  const handleNext = () => {
-    setScanState('idle');
-    setImageError(false);
-    setMonumentIndex((prev) => (prev + 1) % monuments.length);
-  };
-
-  const active = monuments[monumentIndex];
-
-  return (
-    <div className="flex flex-col h-full bg-slate-900 overflow-hidden relative text-white font-sans">
-      {/* Background Image or Fallback */}
-      {!imageError ? (
-        <img 
-          src={active.image} 
-          alt={active.name}
-          onError={() => setImageError(true)}
-          className="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-in-out z-0 animate-fade-in" 
-        />
-      ) : (
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-zinc-900 to-slate-950 flex flex-col items-center justify-center p-4 text-center z-0">
-          <div className="w-12 h-12 rounded-full bg-sky-500/10 border border-sky-400/20 flex items-center justify-center mb-2.5 animate-pulse">
-            <Camera className="text-sky-400" size={20} />
-          </div>
-          <span className="text-[9px] font-black uppercase tracking-widest text-sky-400">{active.name}</span>
-          <span className="text-[7px] text-zinc-400 mt-1 max-w-[150px] leading-normal font-medium">Spot preview active. Tap scan below to identify the monument.</span>
-        </div>
-      )}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-[0.5px]" />
-
-      {/* Grid Overlay */}
-      <div className="absolute inset-0 grid grid-cols-4 grid-rows-6 pointer-events-none opacity-20">
-        {[...Array(24)].map((_, i) => (
-          <div key={i} className="border-[0.5px] border-white/20" />
-        ))}
-      </div>
-
-      {/* Scan Line Laser */}
-      {scanState === 'scanning' && (
-        <motion.div
-          className="absolute left-0 right-0 h-1 bg-sky-400 shadow-[0_0_15px_rgba(56,189,248,0.8)] z-20"
-          initial={{ top: "0%" }}
-          animate={{ top: ["0%", "100%", "0%"] }}
-          transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
-        />
-      )}
-
-      {/* Top Banner Navigation */}
-      <div className="absolute top-3 left-0 right-0 px-3 flex justify-between items-center z-30">
-        <span className="bg-black/60 backdrop-blur-md text-[8px] font-black tracking-widest uppercase py-1 px-2 rounded-full border border-white/10 flex items-center gap-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          AI Scanner
-        </span>
-        <button 
-          onClick={handleNext}
-          className="bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-[8px] font-black tracking-widest uppercase py-1 px-2.5 rounded-full border border-white/10 backdrop-blur-md"
-        >
-          Next ➔
-        </button>
-      </div>
-
-      {/* Target Focus Finder Box */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 border border-white/20 rounded-2xl flex items-center justify-center">
-        <div className={`absolute -top-0.5 -left-0.5 w-4 h-4 border-t-2 border-l-2 rounded-tl transition-colors duration-300 ${scanState === 'scanning' ? 'border-sky-400' : scanState === 'success' ? 'border-emerald-400' : 'border-white/60'}`} />
-        <div className={`absolute -top-0.5 -right-0.5 w-4 h-4 border-t-2 border-r-2 rounded-tr transition-colors duration-300 ${scanState === 'scanning' ? 'border-sky-400' : scanState === 'success' ? 'border-emerald-400' : 'border-white/60'}`} />
-        <div className={`absolute -bottom-0.5 -left-0.5 w-4 h-4 border-b-2 border-l-2 rounded-bl transition-colors duration-300 ${scanState === 'scanning' ? 'border-sky-400' : scanState === 'success' ? 'border-emerald-400' : 'border-white/60'}`} />
-        <div className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 border-b-2 border-r-2 rounded-br transition-colors duration-300 ${scanState === 'scanning' ? 'border-sky-400' : scanState === 'success' ? 'border-emerald-400' : 'border-white/60'}`} />
-
-        <div className="text-center pointer-events-none">
-          {scanState === 'idle' && (
-            <span className="text-[8px] font-bold tracking-wider bg-black/60 py-0.5 px-2 rounded-full text-white/90">Ready</span>
-          )}
-          {scanState === 'scanning' && (
-            <span className="text-[8px] font-bold tracking-wider text-sky-400 animate-pulse bg-sky-950/80 border border-sky-500/20 py-0.5 px-2 rounded-full">Scanning...</span>
-          )}
-          {scanState === 'success' && (
-            <span className="text-[8px] font-bold tracking-wider text-emerald-400 bg-emerald-950/80 border border-emerald-500/20 py-0.5 px-2 rounded-full">Matched</span>
-          )}
-        </div>
-      </div>
-
-      {/* Interactive Scan Trigger Action / Result Slide-up */}
-      <div className="mt-auto p-3 relative z-30 w-full">
-        {scanState !== 'success' ? (
-          <button
-            onClick={handleScan}
-            disabled={scanState === 'scanning'}
-            className={`w-full py-2.5 px-4 rounded-xl text-[9px] font-black tracking-widest uppercase transition-all duration-300 shadow-xl border flex items-center justify-center gap-1.5 ${scanState === 'scanning' ? 'bg-zinc-800 border-zinc-700 text-zinc-500' : 'bg-sky-500 hover:bg-sky-400 border-sky-400 text-white active:scale-98'}`}
-          >
-            {scanState === 'scanning' ? (
-              <>
-                <span className="w-3 h-3 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
-                Scanning...
-              </>
-            ) : (
-              <>
-                <Camera size={12} />
-                Tap to Scan
-              </>
-            )}
-          </button>
-        ) : (
-          <motion.div 
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            className="bg-slate-900/95 border border-white/10 backdrop-blur-md rounded-xl p-3 shadow-2xl flex flex-col text-left space-y-2"
-          >
-            <div>
-              <div className="flex justify-between items-start">
-                <h4 className="text-[11px] font-black text-white">{active.name}</h4>
-                <span className="text-[7px] font-bold tracking-widest text-emerald-400 bg-emerald-950/50 py-0.5 px-1.5 rounded border border-emerald-500/20">EST. {active.built}</span>
-              </div>
-              <p className="text-[8px] text-zinc-400 mt-0.5 leading-normal font-medium">{active.description}</p>
-            </div>
-            
-            <div className="bg-sky-500/10 border border-sky-400/20 rounded-lg p-1.5 flex items-start gap-1">
-              <Sparkles size={10} className="text-sky-400 shrink-0 mt-0.5" />
-              <div className="flex flex-col">
-                <span className="text-[6px] font-black uppercase tracking-widest text-sky-400">Local AI Tip</span>
-                <span className="text-[8px] text-sky-200 mt-0.5 leading-normal font-medium">{active.tip}</span>
-              </div>
-            </div>
-
-            <button 
-              onClick={() => setScanState('idle')}
-              className="w-full py-1 bg-white/5 hover:bg-white/10 rounded border border-white/5 text-[7px] font-black tracking-widest uppercase transition-all duration-200"
-            >
-              Scan Again
-            </button>
-          </motion.div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-const RoutePlannerScreen = ({ isActive = true }: { isActive?: boolean }) => {
-  const [animKey, setAnimKey] = useState(0);
-
-  useEffect(() => {
-    if (isActive) setAnimKey((k) => k + 1);
-  }, [isActive]);
-
-  return (
-  <div className="flex flex-col h-full bg-slate-50 relative overflow-hidden">
-    <motion.div
-      className="absolute inset-0 bg-[#f8fafc] opacity-50 scale-110"
-      animate={isActive ? { x: [0, -6, 0], y: [0, -4, 0] } : { x: 0, y: 0 }}
-      transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-    >
-      <svg className="w-full h-full opacity-20" viewBox="0 0 100 100" preserveAspectRatio="none">
-        <path d="M0 20 Q 25 25 50 20 T 100 25 V 100 H 0 Z" fill="#e2e8f0" />
-        <path d="M0 40 Q 25 45 50 40 T 100 45 V 100 H 0 Z" fill="#cbd5e1" />
-        <line x1="10" y1="0" x2="10" y2="100" stroke="#cbd5e1" strokeWidth="0.5" />
-        <line x1="30" y1="0" x2="30" y2="100" stroke="#cbd5e1" strokeWidth="0.5" />
-        <line x1="50" y1="0" x2="50" y2="100" stroke="#cbd5e1" strokeWidth="0.5" />
-        <line x1="70" y1="0" x2="70" y2="100" stroke="#cbd5e1" strokeWidth="0.5" />
-        <line x1="90" y1="0" x2="90" y2="100" stroke="#cbd5e1" strokeWidth="0.5" />
-      </svg>
-    </motion.div>
-    <svg className="absolute inset-0 w-full h-full z-10" viewBox="0 0 200 400">
-      <motion.path
-        key={`route-${animKey}`}
-        d="M 40 320 C 60 280, 140 240, 100 180 S 160 100, 150 60"
-        fill="transparent"
-        stroke="#fbbf24"
-        strokeWidth="6"
-        strokeLinecap="round"
-        initial={{ pathLength: 0 }}
-        animate={{ pathLength: isActive ? 1 : 0 }}
-        transition={{ duration: 2, ease: "easeInOut" }}
-      />
-      <motion.circle
-        cx="40"
-        cy="320"
-        r="6"
-        fill="#fbbf24"
-        animate={isActive ? { r: [6, 10, 6] } : { r: 6 }}
-        transition={{ repeat: Infinity, duration: 2 }}
-      />
-      <motion.circle
-        cx="150"
-        cy="60"
-        r="6"
-        fill="#fbbf24"
-        animate={isActive ? { r: [6, 9, 6], opacity: [1, 0.75, 1] } : { r: 6 }}
-        transition={{ repeat: Infinity, duration: 1.5 }}
-      />
-    </svg>
-    <div className="p-4 relative z-20">
-      <div className="bg-white rounded-xl p-3 shadow-md border border-gray-100 flex items-center gap-3">
-        <div className="w-2 h-2 rounded-full bg-sky-500" />
-        <span className="text-xs font-medium text-gray-400">Where to next?</span>
-      </div>
-    </div>
-    <div className="mt-auto p-4 relative z-20">
-      <div className="bg-white rounded-2xl p-4 shadow-xl border border-gray-100 flex items-center gap-4">
-        <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
-          <MapPin size={20} />
-        </div>
-        <div>
-          <h4 className="text-xs font-bold text-gray-900">Ria Formosa Boat Trip</h4>
-          <p className="text-[10px] text-gray-500">Starting in 15 mins</p>
-        </div>
-        <div className="ml-auto w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center">
-          <ArrowRight size={14} className="text-gray-400" />
-        </div>
-      </div>
-    </div>
-  </div>
-  );
-};
-
-const MapsIntegrationScreen = () => (
-  <div className="flex flex-col h-full bg-white relative overflow-hidden">
-    <div className="flex-1 bg-gray-100 relative">
-      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=800&q=80')] bg-cover opacity-60" />
-      <div className="absolute top-4 left-4 right-4 bg-white rounded-full h-10 shadow-lg border border-gray-100 flex items-center px-4 gap-2">
-        <MapPin size={14} className="text-gray-400" />
-        <span className="text-[10px] text-gray-400 font-medium">Search in Faro...</span>
-      </div>
-      <div className="absolute bottom-4 right-4 flex flex-col gap-2">
-        <div className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center">
-          <img src="/logos/google-play.png" className="w-5 h-5 grayscale opacity-50" alt="" />
-        </div>
-        <div className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center">
-          <img src="/logos/apple.png" className="w-5 h-5 grayscale opacity-50" alt="" />
-        </div>
-      </div>
-    </div>
-    <div className="p-4 bg-white border-t border-gray-50 space-y-3">
-      <div className="flex justify-between items-center">
-        <h4 className="text-xs font-bold text-gray-900">Open in Maps</h4>
-        <div className="flex gap-2">
-          <div className="px-2 py-1 bg-blue-50 text-blue-600 text-[8px] font-bold rounded uppercase">Google</div>
-          <div className="px-2 py-1 bg-gray-50 text-gray-600 text-[8px] font-bold rounded uppercase">Apple</div>
-        </div>
-      </div>
-      <p className="text-[9px] text-gray-500 leading-tight">Send this route directly to your favorite navigation app for a hands-free experience.</p>
-    </div>
-  </div>
-);
-
-const TipsScreen = () => (
-  <div className="flex flex-col h-full bg-pink-50/50 p-4 space-y-4">
-    <div className="flex justify-between items-center">
-      <h4 className="text-sm font-black text-gray-900">Personalized</h4>
-      <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 2, repeat: Infinity }}>
-        <Heart size={16} className="text-pink-500" />
-      </motion.div>
-    </div>
-    {[
-      { title: "Hidden Cafe", cat: "Food", rating: "4.9", color: "bg-orange-100 text-orange-600" },
-      { title: "Desert Island", cat: "Nature", rating: "5.0", color: "bg-sky-100 text-sky-600" },
-      { title: "Local Market", cat: "Culture", rating: "4.7", color: "bg-purple-100 text-purple-600" }
-    ].map((item, i) => (
-      <motion.div
-        key={i}
-        className="bg-white rounded-2xl p-4 shadow-sm border border-pink-100 flex items-center gap-3"
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: i * 0.1 }}
-      >
-        <div className={`w-10 h-10 rounded-xl ${item.color} flex items-center justify-center font-bold text-xs`}>
-          {item.cat[0]}
-        </div>
-        <div className="flex-1">
-          <h5 className="text-xs font-bold text-gray-900">{item.title}</h5>
-          <p className="text-[10px] text-gray-500">{item.cat} • {item.rating} ★</p>
-        </div>
-      </motion.div>
-    ))}
-    <div className="bg-gradient-to-br from-pink-500 to-rose-600 rounded-2xl p-4 text-white">
-      <p className="text-[10px] font-medium opacity-80 uppercase tracking-widest">AI Recommendation</p>
-      <h5 className="text-sm font-bold mt-1">Best sunset spot today is Faro Marina at 20:14</h5>
-    </div>
-  </div>
-);
-
-const FeaturePhoneScreens = ({
-  activeFeature,
-  isActive = true,
-}: {
-  activeFeature: number;
-  isActive?: boolean;
-}) => (
-  <>
-    {activeFeature === 0 && <AIScanScreen />}
-    {activeFeature === 1 && <RoutePlannerScreen isActive={isActive} />}
-    {activeFeature === 2 && <MapsIntegrationScreen />}
-    {activeFeature === 3 && <TipsScreen />}
-  </>
-);
-
-const MobileFeaturesCarousel = () => {
-  const [activeFeature, setActiveFeature] = useState(0);
-  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
-
-  useEffect(() => {
-    if (!carouselApi) return;
-
-    const onSelect = () => {
-      setActiveFeature(carouselApi.selectedScrollSnap());
-    };
-
-    onSelect();
-    carouselApi.on("select", onSelect);
-    return () => {
-      carouselApi.off("select", onSelect);
-    };
-  }, [carouselApi]);
-
-  const currentAurora = stickyFeatures[activeFeature].aurora;
-
-  return (
-    <section
-      id="features"
-      className="relative overflow-hidden py-8 min-h-[85dvh] flex flex-col justify-center"
-      style={{
-        "--aurora-1": currentAurora[1],
-        "--aurora-2": currentAurora[2],
-        "--aurora-3": currentAurora[3],
-        "--aurora-4": currentAurora[4],
-      } as React.CSSProperties}
-    >
-      <div className="absolute inset-0 aurora-bg z-0 pointer-events-none" />
-
-      <div className="container mx-auto px-4 relative z-10 flex flex-col gap-5">
-        <h2 className="text-3xl font-black text-gray-900 tracking-tighter leading-tight text-center">
-          Everything{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-500 to-pink-500">
-            you need
-          </span>
-        </h2>
-
-        <Carousel
-          setApi={setCarouselApi}
-          opts={{ align: "center", loop: false }}
-          className="w-full"
-        >
-          <CarouselContent className="ml-0">
-            {stickyFeatures.map((feature, idx) => (
-              <CarouselItem key={idx} className="pl-0 basis-full">
-                <div className="flex flex-col items-center px-2">
-                  <div className="flex flex-col items-center text-center gap-3 min-h-[140px]">
-                    <div
-                      className={`w-10 h-10 flex items-center justify-center rounded-xl bg-white/60 backdrop-blur-xl border border-white/80 shadow-sm ${feature.color}`}
-                    >
-                      <feature.icon size={22} strokeWidth={2.5} />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-black text-gray-900">{feature.title}</h3>
-                      <p className="text-sm text-gray-600 mt-1.5 font-medium leading-snug max-w-[280px] mx-auto">
-                        {feature.description}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div
-                    className="flex justify-center gap-2 my-4 w-full"
-                    role="tablist"
-                    aria-label="Features"
-                  >
-                    {stickyFeatures.map((_, dotIdx) => (
-                      <button
-                        key={dotIdx}
-                        type="button"
-                        role="tab"
-                        aria-selected={activeFeature === dotIdx}
-                        aria-label={`Feature ${dotIdx + 1}`}
-                        onClick={() => carouselApi?.scrollTo(dotIdx)}
-                        className={`h-1.5 rounded-full transition-all duration-300 ${
-                          activeFeature === dotIdx
-                            ? "w-6 bg-gradient-to-r from-sky-500 to-pink-500"
-                            : "w-3 bg-gray-200"
-                        }`}
-                      />
-                    ))}
-                  </div>
-
-                  <div className="flex justify-center items-center relative h-auto pb-2">
-                    <div
-                      className={`absolute w-[220px] h-[220px] rounded-full blur-[80px] opacity-30 -z-10 ${feature.color}`}
-                    />
-                    <div className="phone-mockup phone-mockup--compact z-10">
-                      <div className="phone-notch" />
-                      <div className="phone-screen">
-                        <FeaturePhoneScreens activeFeature={idx} isActive={activeFeature === idx} />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-        </Carousel>
-      </div>
-    </section>
-  );
-};
-
-const DesktopStickyFeatures = () => {
-  const sectionRef = useRef<HTMLElement>(null);
-  const [activeFeature, setActiveFeature] = useState(0);
-  const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      const x = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
-      const y = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
-      setMouseOffset({ x, y });
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
-
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end end"],
-  });
-
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    const featureCount = stickyFeatures.length;
-    const index = Math.min(
-      Math.floor(latest * featureCount),
-      featureCount - 1
-    );
-    setActiveFeature(index);
-  });
-
-  const currentAurora = stickyFeatures[activeFeature].aurora;
-
-  return (
-    <section
-      id="features"
-      ref={sectionRef}
-      className="relative"
-      style={{
-        height: `${(stickyFeatures.length + 1) * 100}vh`,
-        "--aurora-1": currentAurora[1],
-        "--aurora-2": currentAurora[2],
-        "--aurora-3": currentAurora[3],
-        "--aurora-4": currentAurora[4],
-      } as React.CSSProperties}
-    >
-      <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 aurora-bg z-0 pointer-events-none" />
-
-        <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center relative z-10">
-
-          <div className="space-y-12">
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              className="space-y-4"
-            >
-              <h2 className="text-5xl md:text-7xl font-black text-gray-900 tracking-tighter leading-[0.9]">
-                Everything <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-500 to-pink-500">you need</span>
-              </h2>
-            </motion.div>
-
-            <div className="space-y-6">
-              {stickyFeatures.map((feature, idx) => (
-                <motion.div
-                  key={idx}
-                  className={`flex items-start gap-6 cursor-pointer group p-4 rounded-2xl transition-all duration-500 ${activeFeature === idx ? "bg-white/60 shadow-xl shadow-gray-200/20 backdrop-blur-2xl border border-white/80" : "opacity-40"}`}
-                  onClick={() => {
-                    const el = sectionRef.current;
-                    if (el) {
-                      const top = el.offsetTop + (idx * window.innerHeight);
-                      window.scrollTo({ top, behavior: 'smooth' });
-                    }
-                  }}
-                >
-                  <div className={`w-12 h-12 flex items-center justify-center shrink-0 transition-transform duration-500 ${activeFeature === idx ? "scale-110 " + feature.color : "text-gray-400"}`}>
-                    <feature.icon size={32} strokeWidth={2.5} />
-                  </div>
-                  <div>
-                    <h3 className={`text-xl font-black ${activeFeature === idx ? "text-gray-900" : "text-gray-400"}`}>
-                      {feature.title}
-                    </h3>
-                    <AnimatePresence initial={false}>
-                      {activeFeature === idx && (
-                        <motion.p
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          className="text-sm text-gray-600 mt-2 font-medium overflow-hidden"
-                        >
-                          {feature.description}
-                        </motion.p>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex justify-center items-center relative h-[700px]">
-            <AnimatePresence>
-              <motion.div
-                key={activeFeature}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                className="absolute inset-0 z-0 pointer-events-none"
-              >
-                {[...Array(6)].map((_, i) => {
-                  const Icon = stickyFeatures[activeFeature].floatingIcons[i] || Sparkles;
-                  return (
-                    <motion.div
-                      key={i}
-                      className="absolute bg-white/80 backdrop-blur-xl rounded-full border border-white shadow-[0_8px_32px_rgba(0,0,0,0.1)] flex items-center justify-center"
-                      style={{
-                        width: 50 + (i * 12),
-                        height: 50 + (i * 12),
-                        top: `${10 + (i * 15)}%`,
-                        left: i % 2 === 0 ? `${-8 + (i * 4)}%` : `${82 - (i * 4)}%`,
-                        transform: `translate(${mouseOffset.x * (15 + i * 8)}px, ${mouseOffset.y * (15 + i * 8)}px)`,
-                        transition: "transform 0.2s cubic-bezier(0.25, 1, 0.5, 1)"
-                      }}
-                      animate={{ y: [0, -30, 0], rotate: [0, 15, -15, 0] }}
-                      transition={{ duration: 5 + i, repeat: Infinity, delay: i * 0.5 }}
-                    >
-                      <div className={stickyFeatures[activeFeature].textColor}>
-                        <Icon size={24 + (i * 2)} />
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </motion.div>
-            </AnimatePresence>
-
-            <motion.div
-              className="phone-mockup z-10"
-              style={{ perspective: "1000px" }}
-              animate={{ rotateY: activeFeature % 2 === 0 ? 8 : -8, rotateX: 5, y: [0, -15, 0] }}
-              transition={{ y: { duration: 5, repeat: Infinity, ease: "easeInOut" }, rotateY: { duration: 1, type: "spring", stiffness: 100 } }}
-            >
-              <div className="phone-notch" />
-              <div className="phone-screen">
-                <AnimatePresence>
-                  <motion.div
-                    key={activeFeature}
-                    className="w-full h-full"
-                    initial={{ y: "100%", opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: "-100%", opacity: 0 }}
-                    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                  >
-                    <FeaturePhoneScreens activeFeature={activeFeature} isActive />
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-            </motion.div>
-            <motion.div
-              className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full blur-[120px] opacity-30 -z-10 transition-colors duration-1000 ${stickyFeatures[activeFeature].color}`}
-            />
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-const StickyFeaturesSection = () => {
-  const isMobile = useIsMobile();
-  return isMobile ? <MobileFeaturesCarousel /> : <DesktopStickyFeatures />;
-};
 
 // Reusable Pre-order Form Component
 // StarField Component for the final CTA
@@ -875,9 +204,10 @@ const Navbar = () => {
 
   return (
     <motion.nav
-      initial={{ y: -100, opacity: 0 }}
+      initial={{ y: -60, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+      exit={{ y: -60, opacity: 0 }}
+      transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
       className="fixed top-0 left-0 right-0 z-[100] flex justify-center p-3 md:p-4 pointer-events-none"
     >
       <div className={`
@@ -1048,7 +378,966 @@ const PreOrderForm = ({
   );
 };
 
+// Word-by-word staggered reveal component for a truly premium typography animation
+const TypographicResponse = ({ text }: { text: string }) => {
+  const words = text.split(" ");
+  return (
+    <p className="text-slate-800 text-lg md:text-2xl font-semibold leading-relaxed font-sans text-center">
+      {words.map((word, idx) => (
+        <motion.span
+          key={idx}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            duration: 0.3,
+            delay: idx * 0.035,
+            ease: [0.16, 1, 0.3, 1]
+          }}
+          className="inline-block mr-1.5"
+        >
+          {word}
+        </motion.span>
+      ))}
+    </p>
+  );
+};
+
+// Custom Chevron SVG Icons for AppShowcaseSection
+const ChevronLeftIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+);
+
+const ChevronRightIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+);
+
+// App Screenshots Data for the clip-path carousel (skiper54 inspired)
+const screenshots = [
+  {
+    image: "/screenshots/ss/30f3959a-0204-474d-82aa-3082d08e6317.jpg",
+    title: "Day Plan Example",
+    tagline: "",
+    description: "Experience a fully tailored day plan. Explore optimal routes across Ria Formosa, historic quarters, and hidden beaches, custom-timed by our smart engine.",
+    icon: Map,
+    color: "text-blue-600",
+    bgColor: "bg-sky-50",
+    borderColor: "border-sky-100",
+    clipPath: "circle(0% at 50% 50%)",
+    clipPathActive: "circle(120% at 50% 50%)"
+  },
+  {
+    image: "/screenshots/ss/41557b5a-3001-4dda-bb93-652e484b3a8a.jpg",
+    title: "Interactive Explorer",
+    tagline: "",
+    description: "Discover deserted islands, pristine beaches, and natural parks. Access live ferry times, water taxi booking, and accessibility data.",
+    icon: Compass,
+    color: "text-green-600",
+    bgColor: "bg-emerald-50",
+    borderColor: "border-emerald-100",
+    clipPath: "inset(50% 0% 50% 0%)",
+    clipPathActive: "inset(0% 0% 0% 0%)"
+  },
+  {
+    image: "/screenshots/ss/05e0f95a-4f6d-41d0-b099-a38cb48bb460.jpg",
+    title: "Smart Scanner",
+    tagline: "",
+    description: "Point your camera at any local landmark to instantly identify historical monuments, scan structures, and unlock curated audio guides.",
+    icon: Camera,
+    color: "text-amber-500",
+    bgColor: "bg-amber-50",
+    borderColor: "border-amber-100",
+    clipPath: "polygon(0 0, 0 0, 0 100%, 0 100%)",
+    clipPathActive: "polygon(0 0, 100% 0, 100% 100%, 0 100%)"
+  },
+  {
+    image: "/screenshots/ss/ba263dd0-1875-4a3a-855d-e66b43fbe77c.jpg",
+    title: "Trip Planner",
+    tagline: "",
+    description: "Generate your custom route in seconds. Simply choose your duration, select your interests, and let our AI assemble your optimized day.",
+    icon: Calendar,
+    color: "text-red-500",
+    bgColor: "bg-pink-50",
+    borderColor: "border-pink-100",
+    clipPath: "circle(0% at 100% 100%)",
+    clipPathActive: "circle(142% at 100% 100%)"
+  },
+  {
+    image: "/screenshots/ss/5729b3d7-595d-4d2e-9bf6-ee7a50cd0461.jpg",
+    title: "Profile Page",
+    tagline: "",
+    description: "Track your travel stats, manage saved spots, and view custom achievements and digital badges unlocked as you explore Faro.",
+    icon: User,
+    color: "text-purple-600",
+    bgColor: "bg-purple-50",
+    borderColor: "border-purple-100",
+    clipPath: "inset(0% 50% 0% 50%)",
+    clipPathActive: "inset(0% 0% 0% 0%)"
+  }
+];
+
+// Premium App Showcase Section featuring the clip-path carousel (skiper54 inspired)
+const AppShowcaseSection = () => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const autoplayRef = useRef<NodeJS.Timeout | null>(null);
+
+  const startAutoplay = () => {
+    if (autoplayRef.current) clearInterval(autoplayRef.current);
+    autoplayRef.current = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % screenshots.length);
+    }, 4000);
+  };
+
+  useEffect(() => {
+    startAutoplay();
+    return () => {
+      if (autoplayRef.current) clearInterval(autoplayRef.current);
+    };
+  }, []);
+
+  const handleSelectFeature = (idx: number) => {
+    setActiveIndex(idx);
+    startAutoplay();
+  };
+
+  const handlePrev = () => {
+    setActiveIndex((prev) => (prev - 1 + screenshots.length) % screenshots.length);
+    startAutoplay();
+  };
+
+  const handleNext = () => {
+    setActiveIndex((prev) => (prev + 1) % screenshots.length);
+    startAutoplay();
+  };
+
+  const activeScreenshot = screenshots[activeIndex];
+
+  return (
+    <section id="features" className="relative w-full py-32 bg-slate-50 overflow-hidden border-t border-slate-100 selection:bg-sky-200">
+      
+      {/* Blueprint style layout overlay */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03] select-none">
+        <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="1" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)" />
+        </svg>
+      </div>
+
+      <div className="container mx-auto px-4 max-w-6xl relative z-10">
+        
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          
+          {/* LEFT COLUMN: Feature List & Descriptions */}
+          <div className="flex flex-col gap-4">
+            
+            {/* Left aligned title for this section */}
+            <div className="space-y-4 mb-6">
+              <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.95]">
+                <span className="text-slate-900">Everything</span> <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-pink-500 to-amber-500">you need</span> <br />
+                <span className="text-slate-900 text-4xl md:text-6xl mt-2 block">in one app</span>
+              </h2>
+            </div>
+
+            {[1, 2, 0, 3, 4].map((screenshotsIndex) => {
+              const item = screenshots[screenshotsIndex];
+              const IconComponent = item.icon;
+              const isActive = activeIndex === screenshotsIndex;
+
+              return (
+                <button
+                  key={screenshotsIndex}
+                  onClick={() => handleSelectFeature(screenshotsIndex)}
+                  className={`relative flex items-start gap-4 p-5 rounded-2xl border text-left cursor-pointer transition-all duration-500 ${isActive ? 'bg-white shadow-[0_15px_45px_rgba(0,0,0,0.03)] border-slate-200/80' : 'bg-transparent border-transparent hover:bg-slate-100/50 hover:border-slate-150/40 opacity-65 hover:opacity-90'}`}
+                >
+                  <div className={`shrink-0 flex items-center justify-center ${item.color} mt-1.5`}>
+                    <IconComponent size={24} strokeWidth={2.5} />
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <h3 className="text-lg font-black text-slate-800">
+                      {item.title}
+                    </h3>
+                    <AnimatePresence initial={false}>
+                      {isActive && (
+                        <motion.p
+                          initial={{ height: 0, opacity: 0, marginTop: 0 }}
+                          animate={{ height: "auto", opacity: 1, marginTop: 8 }}
+                          exit={{ height: 0, opacity: 0, marginTop: 0 }}
+                          transition={{ duration: 0.35, ease: "easeOut" }}
+                          className="text-xs text-slate-500 font-semibold overflow-hidden leading-relaxed"
+                        >
+                          {item.description}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Autoplay progress bar at the bottom */}
+                  {isActive && (
+                    <motion.div
+                      key={screenshotsIndex}
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ duration: 4, ease: "linear" }}
+                      className="absolute bottom-0 left-0 right-0 h-[3.5px] origin-left rounded-full bg-gradient-to-r from-sky-400 to-blue-500"
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* RIGHT COLUMN: Mobile Showcase with clipPath carousel */}
+          <div className="flex flex-col items-center justify-center relative">
+            
+            {/* Soft ambient glowing background orbs */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-sky-200/30 blur-[100px] rounded-full -z-10 animate-pulse" />
+
+            {/* Custom high-fidelity phone frame */}
+            <div className="relative w-[290px] h-[600px] bg-slate-950 rounded-[44px] border-[8px] border-slate-900 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.15),0_30px_60px_-30px_rgba(0,0,0,0.2),inset_0_-2px_6px_0_rgba(255,255,255,0.08)] overflow-hidden select-none">
+              {/* iPhone Notch */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-7 bg-slate-950 rounded-b-2xl z-50 flex items-center justify-center gap-1.5 pointer-events-none">
+                <span className="w-10 h-1 bg-zinc-800 rounded-full" />
+                <span className="w-2.5 h-2.5 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center">
+                  <span className="w-1 h-1 rounded-full bg-blue-900" />
+                </span>
+              </div>
+
+              {/* Screens clipPath Carousel Container */}
+              <div className="w-full h-full relative bg-slate-900 rounded-[36px] overflow-hidden">
+                
+                {/* Underneath image (the previous screenshot, to make the sweep reveal smooth with no blank screens) */}
+                <div className="absolute inset-0 w-full h-full bg-slate-900">
+                  <img
+                    src={screenshots[(activeIndex - 1 + screenshots.length) % screenshots.length].image}
+                    alt="Underneath screen"
+                    className="w-full h-full object-cover rounded-[32px] opacity-40 scale-[1.02] blur-[1px]"
+                  />
+                </div>
+
+                {/* Active morphing clip-path image slide */}
+                <AnimatePresence mode="popLayout">
+                  <motion.img
+                    key={activeIndex}
+                    src={activeScreenshot.image}
+                    alt={activeScreenshot.title}
+                    initial={{ clipPath: activeScreenshot.clipPath }}
+                    animate={{ clipPath: activeScreenshot.clipPathActive }}
+                    transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1] }}
+                    className="absolute inset-0 w-full h-full object-cover rounded-[32px]"
+                  />
+                </AnimatePresence>
+
+              </div>
+            </div>
+
+            {/* Slider Navigation Dots and Controls */}
+            <div className="flex items-center gap-6 mt-8">
+              <button
+                onClick={handlePrev}
+                className="w-12 h-12 rounded-full bg-white hover:bg-slate-50 border border-slate-200/80 shadow-sm text-slate-600 flex items-center justify-center cursor-pointer transition-all active:scale-95"
+              >
+                <ChevronLeftIcon />
+              </button>
+
+              <div className="flex items-center gap-2">
+                {[1, 2, 0, 3, 4].map((screenshotsIndex) => (
+                  <button
+                    key={screenshotsIndex}
+                    onClick={() => handleSelectFeature(screenshotsIndex)}
+                    className={`h-2 rounded-full cursor-pointer transition-all duration-300 ${activeIndex === screenshotsIndex ? 'w-6 bg-slate-800' : 'w-2 bg-slate-300 hover:bg-slate-400'}`}
+                  />
+                ))}
+              </div>
+
+              <button
+                onClick={handleNext}
+                className="w-12 h-12 rounded-full bg-white hover:bg-slate-50 border border-slate-200/80 shadow-sm text-slate-600 flex items-center justify-center cursor-pointer transition-all active:scale-95"
+              >
+                <ChevronRightIcon />
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+  );
+};
+
+// Premium coverflow screenshot carousel continuation (skiper54 inspired)
+const ScreensCarouselSection = () => {
+  const carouselImages = [
+    "/screenshots/ss/30f3959a-0204-474d-82aa-3082d08e6317.jpg", // Island Discovery
+    "/screenshots/ss/41557b5a-3001-4dda-bb93-652e484b3a8a.jpg", // Smart Scanner
+    "/screenshots/ss/05e0f95a-4f6d-41d0-b099-a38cb48bb460.jpg", // Day Plan Example
+    "/screenshots/ss/5729b3d7-595d-4d2e-9bf6-ee7a50cd0461.jpg", // Trip Planner
+    "/screenshots/ss/ba263dd0-1875-4a3a-855d-e66b43fbe77c.jpg"  // Profile Page
+  ];
+
+  const [currentIndex, setCurrentIndex] = useState(2); // Start with Day Plan active
+  const autoplayRef = useRef<NodeJS.Timeout | null>(null);
+
+  const startAutoplay = () => {
+    if (autoplayRef.current) clearInterval(autoplayRef.current);
+    autoplayRef.current = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % carouselImages.length);
+    }, 4500);
+  };
+
+  useEffect(() => {
+    startAutoplay();
+    return () => {
+      if (autoplayRef.current) clearInterval(autoplayRef.current);
+    };
+  }, []);
+
+  const getOffset = (idx: number) => {
+    let diff = idx - currentIndex;
+    const len = carouselImages.length;
+    if (diff < -len / 2) diff += len;
+    if (diff > len / 2) diff -= len;
+    return diff;
+  };
+
+  const handleSelectFeature = (idx: number) => {
+    setCurrentIndex(idx);
+    startAutoplay();
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % carouselImages.length);
+    startAutoplay();
+  };
+
+  const handlePrev = () => {
+    setCurrentIndex((prev) => (prev - 1 + carouselImages.length) % carouselImages.length);
+    startAutoplay();
+  };
+
+  return (
+    <section className="relative w-full py-16 bg-slate-50 overflow-hidden select-none border-b border-slate-100 flex flex-col items-center justify-center">
+      {/* 3D Coverflow Container */}
+      <div className="relative w-full max-w-5xl h-[620px] flex items-center justify-center">
+        
+        {/* Soft background glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[350px] bg-sky-100/40 blur-[130px] rounded-full pointer-events-none" />
+
+        {/* Carousel Window */}
+        <div className="relative w-full h-full flex items-center justify-center overflow-visible">
+          <AnimatePresence initial={false}>
+            {carouselImages.map((img, idx) => {
+              const offset = getOffset(idx);
+              const isActive = offset === 0;
+              const isVisible = Math.abs(offset) <= 2;
+
+              if (!isVisible) return null;
+
+              return (
+                <motion.div
+                  key={idx}
+                  style={{
+                    zIndex: 10 - Math.abs(offset),
+                  }}
+                  animate={{
+                    x: offset * 265,
+                    scale: isActive ? 1.0 : 0.82 - Math.abs(offset) * 0.04,
+                    opacity: isActive ? 1.0 : 0.65 - Math.abs(offset) * 0.15,
+                  }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 280,
+                    damping: 32,
+                    mass: 0.8
+                  }}
+                  onClick={() => handleSelectFeature(idx)}
+                  className={`absolute w-[270px] h-[540px] rounded-[2.2rem] overflow-hidden border-[6px] border-white shadow-[0_20px_50px_rgba(0,0,0,0.1)] cursor-pointer select-none transition-shadow hover:shadow-[0_25px_60px_rgba(0,0,0,0.15)]`}
+                >
+                  <img
+                    src={img}
+                    alt={`App Screen ${idx + 1}`}
+                    className="w-full h-full object-cover pointer-events-none"
+                  />
+                  {!isActive && (
+                    <div className="absolute inset-0 bg-slate-900/10 transition-opacity duration-300 pointer-events-none" />
+                  )}
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+        </div>
+
+        {/* Left/Right Navigation Chevron overlays */}
+        <button
+          onClick={handlePrev}
+          className="absolute left-4 z-40 w-14 h-14 rounded-full bg-white/80 hover:bg-white border border-slate-200/80 shadow-md text-slate-700 flex items-center justify-center cursor-pointer transition-all active:scale-95 hover:scale-105"
+        >
+          <ChevronLeftIcon />
+        </button>
+
+        <button
+          onClick={handleNext}
+          className="absolute right-4 z-40 w-14 h-14 rounded-full bg-white/80 hover:bg-white border border-slate-200/80 shadow-md text-slate-700 flex items-center justify-center cursor-pointer transition-all active:scale-95 hover:scale-105"
+        >
+          <ChevronRightIcon />
+        </button>
+
+      </div>
+    </section>
+  );
+};
+
+// Faro's Interactive AI Chat Component (Skiper UI inspired - skiper84 styled like user references)
+const FaroAIChat = () => {
+  const [chatState, setChatState] = useState<'idle' | 'loading' | 'response'>('idle');
+  const [userQuery, setUserQuery] = useState('');
+  const [inputValue, setInputValue] = useState('');
+  const [aiResponse, setAiResponse] = useState('');
+  const [loadingText, setLoadingText] = useState('A conectar à inteligência local...');
+
+  const loadingTexts = [
+    "A pesquisar nos arquivos históricos de Faro...",
+    "A procurar segredos locais no Algarve...",
+    "A consultar as melhores praias e estadias...",
+    "A planear a sua rota perfeita no Algarve..."
+  ];
+
+  // Rotate loading text while generating
+  useEffect(() => {
+    if (chatState !== 'loading') return;
+
+    let textIdx = 0;
+    const interval = setInterval(() => {
+      textIdx = (textIdx + 1) % loadingTexts.length;
+      setLoadingText(loadingTexts[textIdx]);
+    }, 2200);
+
+    return () => clearInterval(interval);
+  }, [chatState]);
+
+  const suggestedQuestions = [
+    "Onde comer o melhor pastel de nata?",
+    "Quais são os monumentos imperdíveis?",
+    "Recomenda praias em Faro",
+    "Fale-me da Ria Formosa"
+  ];
+
+  const handleSendMessage = async (text: string) => {
+    if (!text.trim() || chatState === 'loading') return;
+
+    setUserQuery(text);
+    setChatState('loading');
+    setLoadingText("A conectar à inteligência local...");
+
+    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+
+    try {
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "gpt-4o",
+          messages: [
+            {
+              role: "system",
+              content: `You are the Discover Faro AI Assistant, a friendly and expert local guide for Faro and the Algarve region in Portugal.
+              Your absolute priority is to only answer questions related to Faro and the Algarve region (including tourism, accommodations, local secrets, restaurants, pastéis de nata, beaches, historical monuments, transport, events, and culture).
+              
+              CRITICAL RULE:
+              If the user asks a question that is completely unrelated to Faro, Algarve, tourism/travel in Portugal, or local cultural activities (for example: explaining general science, writing programming code, discussing general global history outside Portugal, asking about other countries like France/US, capital cities, math, general recipe tutorials, or standard general knowledge), you MUST politely refuse to answer. Re-state clearly and in a friendly way that you are only allowed to answer questions about Faro and the Algarve.
+              
+              Refusal message guidelines:
+              - If in Portuguese, reply: "Desculpe, mas eu sou o Guia de IA da Discover Faro e apenas posso responder a questões sobre Faro e a região do Algarve (turismo, locais históricos, praias, gastronomia, estadias, etc.). Como posso ajudar a planear a sua viagem ao Algarve hoje? 🌴"
+              - If in English or other language, reply: "I'm sorry, but as the Discover Faro AI Assistant, I can only help you with questions regarding Faro and the Algarve region (tourism, local landmarks, beaches, food, accommodation, etc.). How can I help you plan your Algarve trip today? 🌴"
+              
+              Ensure your answers are concise (under 120 words), warm, enthusiastic, and offer practical, highly curated local advice.`
+            },
+            { role: "user", content: text }
+          ]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("API call failed");
+      }
+
+      const data = await response.json();
+      const reply = data?.choices?.[0]?.message?.content || "Ocorreu um erro ao obter a resposta.";
+      setAiResponse(reply);
+      setChatState('response');
+    } catch (error) {
+      console.error("AI Error:", error);
+      setAiResponse("Desculpe, estou com alguma dificuldade em aceder ao meu cérebro de inteligência neste momento. No entanto, recomendo vivamente uma visita à magnífica Sé de Faro, um passeio de barco na Ria Formosa e provar um pastel de nata acabado de sair do forno! 🌴☕");
+      setChatState('response');
+    }
+  };
+
+  const resetChat = () => {
+    setInputValue('');
+    setChatState('idle');
+  };
+
+  return (
+    <section className="relative w-full min-h-[650px] py-32 flex flex-col items-center justify-center overflow-hidden bg-[#e0f2fe]/10 select-none">
+      
+      {/* Apple AI Screen/Section Border Glow Effect */}
+      <AnimatePresence>
+        {chatState === 'loading' && (
+          <motion.div
+            key="apple-ai-border-glow"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="absolute inset-0 z-40 pointer-events-none"
+          >
+            {/* Ambient Halo (highly blurred soft glow radiating inwards/outwards) */}
+            <motion.div
+              animate={{
+                backgroundPosition: ["0% 0%", "200% 0%"]
+              }}
+              transition={{
+                duration: 6,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+              style={{
+                backgroundImage: "linear-gradient(to right, #38bdf8, #818cf8, #c084fc, #f472b6, #fb7185, #fb923c, #38bdf8)",
+                backgroundSize: "200% auto",
+              } as any}
+              className="absolute inset-0 opacity-45 blur-[32px] border-[16px] border-transparent"
+            />
+            
+            {/* Sharp Apple AI Glowing Border Outline */}
+            <motion.div
+              animate={{
+                backgroundPosition: ["0% 0%", "200% 0%"]
+              }}
+              transition={{
+                duration: 6,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+              style={{
+                backgroundImage: "linear-gradient(to right, #38bdf8, #818cf8, #c084fc, #f472b6, #fb7185, #fb923c, #38bdf8)",
+                backgroundSize: "200% auto",
+                border: "4px solid transparent",
+                WebkitMask: "linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)",
+                WebkitMaskComposite: "destination-out",
+                maskComposite: "exclude",
+              } as any}
+              className="absolute inset-0 opacity-90"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Exquisite soft animated "liquid glass" morphing mesh gradient backdrop (skiper84 dominant style) */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        {/* Soft Sky Blue Liquid Blob */}
+        <motion.div
+          animate={{
+            x: [0, 90, -70, 0],
+            y: [0, -80, 60, 0],
+            scale: [1, 1.25, 0.9, 1],
+            borderRadius: ["42% 58% 70% 30% / 45% 45% 55% 55%", "70% 30% 52% 48% / 60% 40% 60% 40%", "48% 52% 35% 65% / 40% 65% 35% 60%", "42% 58% 70% 30% / 45% 45% 55% 55%"]
+          }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[-20%] left-[-15%] w-[85%] h-[85%] bg-sky-200/50 blur-[100px]"
+        />
+        {/* Soft Vibrant Cyan Liquid Blob */}
+        <motion.div
+          animate={{
+            x: [0, -80, 90, 0],
+            y: [0, 60, -70, 0],
+            scale: [1, 0.95, 1.2, 1],
+            borderRadius: ["50% 50% 30% 70% / 50% 60% 40% 50%", "30% 70% 70% 30% / 50% 30% 70% 50%", "60% 40% 48% 52% / 45% 55% 45% 55%", "50% 50% 30% 70% / 50% 60% 40% 50%"]
+          }}
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-[-15%] right-[-10%] w-[80%] h-[80%] bg-cyan-200/45 blur-[90px]"
+        />
+        {/* Soft Ice Blue Center Liquid Blob */}
+        <motion.div
+          animate={{
+            x: [50, -50, 50],
+            y: [-30, 30, -30],
+            scale: [0.9, 1.15, 0.9],
+            borderRadius: ["40% 60% 50% 50% / 40% 40% 60% 60%", "60% 40% 60% 40% / 50% 60% 40% 50%", "40% 60% 50% 50% / 40% 40% 60% 60%"]
+          }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[20%] left-[15%] w-[60%] h-[60%] bg-blue-100/60 blur-[110px]"
+        />
+        {/* Pastel Lavender Blob (subtle overlay color transition) */}
+        <motion.div
+          animate={{
+            x: [-60, 40, -60],
+            y: [40, -40, 40],
+            scale: [0.95, 1.1, 0.95],
+            borderRadius: ["45% 55% 60% 40% / 40% 50% 50% 60%", "50% 50% 40% 60% / 60% 40% 60% 40%", "45% 55% 60% 40% / 40% 50% 50% 60%"]
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[10%] right-[-5%] w-[65%] h-[65%] bg-purple-100/40 blur-[100px]"
+        />
+
+        {/* Heavy Liquid Frosted Glass Overlay */}
+        <div className="absolute inset-0 bg-white/10 backdrop-blur-[110px] saturate-[170%]" />
+        
+        {/* Subtle radial glass highlight shine */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.45)_0%,transparent_60%)] pointer-events-none" />
+      </div>
+
+      <div className="container mx-auto px-4 max-w-4xl relative z-10 flex flex-col items-center justify-center flex-1">
+        <AnimatePresence mode="wait">
+          
+          {/* STATE 1: IDLE */}
+          {chatState === 'idle' && (
+            <motion.div
+              key="idle"
+              initial={{ opacity: 0, y: 35 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -30 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="w-full flex flex-col items-center space-y-12 text-center"
+            >
+              <div className="space-y-4">
+                
+                <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-slate-800 leading-none">
+                  Faro AI Guide
+                </h2>
+                <p className="text-slate-500 text-sm md:text-base font-semibold max-w-md mx-auto">
+                  Ask about beaches, gastronomy, hotels, or monuments. The AI only responds to Faro/Algarve queries.
+                </p>
+              </div>
+
+              {/* Minimalist Premium Pill Input Bar (Exact clone of user references) */}
+              <div className="w-full max-w-xl bg-white rounded-full shadow-[0_15px_45px_rgba(0,0,0,0.04)] border border-slate-100/80 p-2 flex items-center gap-3 h-16 group transition-all duration-300 hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:border-slate-200">
+                <div className="pl-3">
+                  <Plus className="text-slate-400 cursor-pointer hover:text-slate-600 transition-colors" size={20} />
+                </div>
+                
+                <input
+                  type="text"
+                  placeholder="Ask anything..."
+                  value={inputValue}
+                  onChange={e => setInputValue(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') handleSendMessage(inputValue);
+                  }}
+                  className="flex-1 bg-transparent px-2 text-slate-800 placeholder-slate-400 focus:outline-none text-base font-semibold"
+                />
+
+                <div className="flex items-center pr-1.5">
+                  <button
+                    onClick={() => handleSendMessage(inputValue)}
+                    disabled={!inputValue.trim()}
+                    className="w-11 h-11 rounded-full bg-slate-950 text-white flex items-center justify-center cursor-pointer hover:bg-slate-850 active:scale-95 transition-all shadow-md shrink-0 disabled:pointer-events-none"
+                  >
+                    <ArrowUp size={18} strokeWidth={2.5} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Suggestions Chips */}
+              <div className="flex flex-wrap justify-center gap-3 pt-2 select-none">
+                {suggestedQuestions.map((q, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handleSendMessage(q)}
+                    className="px-4 py-2 rounded-full bg-white/40 border border-white/80 hover:bg-white/70 active:scale-95 transition-all text-[10px] font-black text-slate-600 tracking-wider uppercase shadow-sm cursor-pointer"
+                  >
+                    {q}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* STATE 2: LOADING (With Google-style search bar loading border and rotating loading texts) */}
+          {chatState === 'loading' && (
+            <motion.div
+              key="loading"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="w-full flex flex-col items-center space-y-8 text-center"
+            >
+              {/* Google-style glowing border search bar */}
+              <div className="relative w-full max-w-xl p-[2px] rounded-full overflow-hidden shadow-[0_15px_45px_rgba(0,0,0,0.04)] border border-slate-100/80">
+                {/* Flowing Google Gradient Background */}
+                <motion.div
+                  animate={{
+                    backgroundPosition: ["0% 0%", "200% 0%"]
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }}
+                  style={{
+                    backgroundImage: "linear-gradient(to right, #4285F4, #EA4335, #FBBC05, #34A853, #4285F4)",
+                    backgroundSize: "200% auto",
+                    position: "absolute",
+                    inset: 0,
+                    borderRadius: "9999px",
+                  } as any}
+                />
+                
+                {/* Search Bar Inner Content (White background) */}
+                <div className="relative w-full bg-white rounded-full p-2 flex items-center gap-3 h-16 shadow-[0_10px_30px_rgba(66,133,244,0.06)]">
+                  <div className="pl-3">
+                    <Plus className="text-slate-300 shrink-0" size={20} />
+                  </div>
+                  
+                  <input
+                    type="text"
+                    disabled
+                    value={userQuery}
+                    className="flex-1 bg-transparent px-2 text-slate-500 text-base font-semibold focus:outline-none select-none cursor-not-allowed"
+                  />
+
+                  <div className="flex items-center pr-1.5">
+                    <button
+                      disabled
+                      className="w-11 h-11 rounded-full bg-slate-100 text-slate-300 flex items-center justify-center shrink-0 cursor-not-allowed"
+                    >
+                      <ArrowUp size={18} strokeWidth={2.5} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Centered rotating loading text */}
+              <motion.p
+                animate={{ opacity: [0.6, 1, 0.6] }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+                className="text-slate-500 text-lg md:text-xl font-semibold tracking-tight"
+              >
+                {loadingText}
+              </motion.p>
+            </motion.div>
+          )}
+
+          {/* STATE 3: RESPONSE */}
+          {chatState === 'response' && (
+            <motion.div
+              key="response"
+              initial={{ opacity: 0, y: 35 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -30 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="w-full max-w-3xl flex flex-col items-center space-y-10 text-center"
+            >
+              {/* Previous query highlight */}
+              <div className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                Asked: "{userQuery}"
+              </div>
+
+              {/* Minimalist Centered Responsive Glassmorphic Card */}
+              <div className="relative px-8 py-8 md:px-12 md:py-10 rounded-[2.2rem] bg-white/45 backdrop-blur-md border border-white/70 shadow-[0_20px_50px_rgba(0,0,0,0.03)] max-w-2xl">
+                <TypographicResponse text={aiResponse} />
+              </div>
+
+              {/* Circular plus button to reset / ask again */}
+              <div className="flex flex-col items-center gap-2">
+                <motion.button
+                  onClick={resetChat}
+                  whileHover={{ scale: 1.1, rotate: 90 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="w-12 h-12 rounded-full bg-slate-950 text-white flex items-center justify-center cursor-pointer hover:bg-slate-850 shadow-lg"
+                >
+                  <Plus size={24} strokeWidth={2.5} />
+                </motion.button>
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
+                  Ask another question
+                </span>
+              </div>
+            </motion.div>
+          )}
+
+        </AnimatePresence>
+      </div>
+    </section>
+  );
+};
+
+// Words Preloader Component (Skiper UI inspired)
+const WordsPreloader = ({ onComplete }: { onComplete: () => void }) => {
+  const [index, setIndex] = useState(0);
+  const words = [
+    "Olá",              // PT
+    "Welcome",          // EN
+    "Bienvenido",       // ES
+    "Bienvenue",        // FR
+    "Willkommen",       // DE
+    "Welkom",           // NL
+    "Benvenuto",        // IT
+    "欢迎",             // ZH
+    "Добро пожаловать", // RU
+  ];
+
+  useEffect(() => {
+    if (index === words.length - 1) {
+      const timeout = setTimeout(() => {
+        onComplete();
+      }, 800);
+      return () => clearTimeout(timeout);
+    }
+
+    const interval = setTimeout(() => {
+      setIndex((prev) => prev + 1);
+    }, 280);
+
+    return () => clearTimeout(interval);
+  }, [index]);
+
+  const slideUp = {
+    initial: {
+      top: 0
+    },
+    exit: {
+      top: "-100vh",
+      transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] as any, delay: 0.1 }
+    }
+  };
+
+  const pathVariants = {
+    initial: {
+      d: "M0 0 L100 0 L100 100 Q50 150 0 100 L0 0",
+      transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] as any }
+    },
+    exit: {
+      d: "M0 0 L100 0 L100 100 Q50 100 0 100 L0 0",
+      transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] as any }
+    }
+  };
+
+  return (
+    <motion.div 
+      variants={slideUp}
+      initial="initial"
+      exit="exit"
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-gradient-to-b from-[#38bdf8] to-[#0ea5e9] text-white overflow-hidden"
+    >
+      {/* Translucent glowing background circles to match the header sky theme */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-white/25 blur-[100px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-white/10 blur-[80px] rounded-full pointer-events-none" />
+      </div>
+
+      <div className="relative z-10 flex items-center gap-3">
+        <span className="w-2.5 h-2.5 rounded-full bg-white animate-ping absolute -left-8" />
+        <span className="w-2.5 h-2.5 rounded-full bg-white absolute -left-8" />
+        
+        <motion.p
+          key={index}
+          initial={{ opacity: 0, y: 25 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -25 }}
+          transition={{ duration: 0.22, ease: "easeOut" }}
+          className="text-5xl md:text-7xl font-black tracking-tight drop-shadow-md"
+        >
+          {words[index]}
+        </motion.p>
+      </div>
+
+      <svg className="absolute top-0 w-full h-[calc(100%+300px)] pointer-events-none fill-[#0ea5e9] z-0" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <motion.path 
+          variants={pathVariants}
+          initial="initial"
+          exit="exit"
+        />
+      </svg>
+    </motion.div>
+  );
+};
+
+const GradientCursor = () => (
+  <motion.span
+    animate={{ opacity: [1, 0, 1] }}
+    transition={{ duration: 0.8, repeat: Infinity, ease: "steps(2)" as any }}
+    className="inline-block w-[4px] h-[1.15em] ml-1 bg-gradient-to-b from-[#38bdf8] via-[#ec4899] to-[#fbbf24] rounded-full align-middle shadow-[0_0_10px_rgba(236,72,153,0.3)]"
+  />
+);
+
 export default function Home() {
+  const [preloaderActive, setPreloaderActive] = useState(true);
+  const [heroIntroState, setHeroIntroState] = useState<'waiting' | 'typing' | 'completed'>('waiting');
+  const [typedLine1, setTypedLine1] = useState('');
+  const [typedLine2, setTypedLine2] = useState('');
+
+  useEffect(() => {
+    if (preloaderActive || heroIntroState === 'typing') {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [preloaderActive, heroIntroState]);
+
+  const line1Text = "You capture the beauty.";
+  const line2Text = "We handle the rest.";
+
+  useEffect(() => {
+    if (heroIntroState !== 'typing') return;
+
+    let interval: NodeJS.Timeout;
+    let intervalLine2: NodeJS.Timeout;
+
+    // Delay typing by 1200ms to allow the words preloader slide-up transition to fully complete!
+    const delayTimeout = setTimeout(() => {
+      let charIdx = 0;
+      let isTypingLine1 = true;
+      
+      interval = setInterval(() => {
+        if (isTypingLine1) {
+          if (charIdx < line1Text.length) {
+            setTypedLine1(line1Text.slice(0, charIdx + 1));
+            charIdx++;
+          } else {
+            isTypingLine1 = false;
+            charIdx = 0;
+            clearInterval(interval);
+            setTimeout(() => {
+              startLine2();
+            }, 350);
+          }
+        }
+      }, 65);
+
+      const startLine2 = () => {
+        intervalLine2 = setInterval(() => {
+          if (charIdx < line2Text.length) {
+            setTypedLine2(line2Text.slice(0, charIdx + 1));
+            charIdx++;
+          } else {
+            clearInterval(intervalLine2);
+            setTimeout(() => {
+              setHeroIntroState('completed');
+            }, 900);
+          }
+        }, 65);
+      };
+    }, 1400);
+
+    return () => {
+      clearTimeout(delayTimeout);
+      if (interval) clearInterval(interval);
+      if (intervalLine2) clearInterval(intervalLine2);
+    };
+  }, [heroIntroState]);
+
   const ctaRef = useScrollAnimation();
   const [iosSubmitted, setIosSubmitted] = useState(false);
   const [androidSubmitted, setAndroidSubmitted] = useState(false);
@@ -1060,15 +1349,35 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50 selection:bg-sky-200 overflow-x-clip">
-      <Navbar />
+      <AnimatePresence mode="wait">
+        {preloaderActive && (
+          <WordsPreloader onComplete={() => {
+            setPreloaderActive(false);
+            setHeroIntroState('typing');
+          }} />
+        )}
+      </AnimatePresence>
+      
+      <AnimatePresence>
+        {heroIntroState === 'completed' && <Navbar />}
+      </AnimatePresence>
 
       {/* Hero Section (Roamy Style) */}
       <section className="relative min-h-[110svh] flex items-start md:items-center justify-center overflow-hidden roamy-sky-bg pt-28 md:pt-32 pb-48">
         {/* Sky Enhancements */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-white/20 blur-[120px] rounded-full pointer-events-none" />
-          <MovingClouds count={6} speedRange={[70, 110]} opacityRange={[0.2, 0.4]} />
-          <AnimatedBirds />
+          {heroIntroState === 'completed' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 2.2, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute inset-0"
+            >
+              <MovingClouds count={6} speedRange={[70, 110]} opacityRange={[0.2, 0.4]} />
+              <AnimatedBirds />
+            </motion.div>
+          )}
         </div>
 
         <motion.div
@@ -1076,51 +1385,75 @@ export default function Home() {
           className="container mx-auto px-4 relative z-10 text-center"
         >
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, type: "spring", bounce: 0.3 }}
+            transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
             className="space-y-10 max-w-4xl mx-auto mt-2 md:mt-3"
           >
-            <div className="space-y-2">
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white leading-[0.9] tracking-tighter drop-shadow-2xl">
-                You capture <br />
-                the beauty.
-              </h1>
-              <h2 className="text-4xl md:text-6xl lg:text-7xl font-vartigo text-sky-100/90 drop-shadow-xl">
-                We handle the rest.
-              </h2>
+            <div className="space-y-2 select-none">
+              {heroIntroState !== 'completed' ? (
+                <>
+                  <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white leading-[0.9] tracking-tighter drop-shadow-2xl min-h-[2.1em] text-center">
+                    {typedLine1.slice(0, 11)}
+                    {typedLine1.length > 11 && <br />}
+                    {typedLine1.slice(11)}
+                    {heroIntroState === 'typing' && typedLine2 === '' && <GradientCursor />}
+                  </h1>
+                  <h2 className="text-4xl md:text-6xl lg:text-7xl font-vartigo text-sky-100/90 drop-shadow-xl min-h-[1.2em] text-center">
+                    {typedLine2}
+                    {heroIntroState === 'typing' && typedLine2 !== '' && <GradientCursor />}
+                  </h2>
+                </>
+              ) : (
+                <>
+                  <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white leading-[0.9] tracking-tighter drop-shadow-2xl text-center">
+                    You capture <br />
+                    the beauty.
+                  </h1>
+                  <h2 className="text-4xl md:text-6xl lg:text-7xl font-vartigo text-sky-100/90 drop-shadow-xl text-center">
+                    We handle the rest.
+                  </h2>
+                </>
+              )}
             </div>
 
             {/* Store Buttons - White pill style */}
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-8">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="inline-flex items-center justify-center gap-3 bg-white text-gray-900 font-bold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 w-[240px] h-16 px-6"
-                  >
-                    <img src="/logos/apple.png" alt="Apple" className="h-6 w-6" />
-                    Pre-order iOS
-                  </motion.button>
-                </DialogTrigger>
-                <PreOrderForm type="ios" submitted={iosSubmitted} onSubmit={() => setIosSubmitted(true)} />
-              </Dialog>
+            {heroIntroState === 'completed' && (
+              <motion.div
+                initial={{ opacity: 0, y: 25 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
+                className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-8"
+              >
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="inline-flex items-center justify-center gap-3 bg-white text-gray-900 font-bold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 w-[240px] h-16 px-6"
+                    >
+                      <img src="/logos/apple.png" alt="Apple" className="h-6 w-6" />
+                      Pre-order iOS
+                    </motion.button>
+                  </DialogTrigger>
+                  <PreOrderForm type="ios" submitted={iosSubmitted} onSubmit={() => setIosSubmitted(true)} />
+                </Dialog>
 
-              <Dialog>
-                <DialogTrigger asChild>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="inline-flex items-center justify-center gap-3 bg-white text-gray-900 font-bold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 w-[240px] h-16 px-6"
-                  >
-                    <img src="/logos/google-play.png" alt="Google Play" className="h-6 w-6" />
-                    Pre-order Android
-                  </motion.button>
-                </DialogTrigger>
-                <PreOrderForm type="android" submitted={androidSubmitted} onSubmit={() => setAndroidSubmitted(true)} />
-              </Dialog>
-            </div>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="inline-flex items-center justify-center gap-3 bg-white text-gray-900 font-bold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 w-[240px] h-16 px-6"
+                    >
+                      <img src="/logos/google-play.png" alt="Google Play" className="h-6 w-6" />
+                      Pre-order Android
+                    </motion.button>
+                  </DialogTrigger>
+                  <PreOrderForm type="android" submitted={androidSubmitted} onSubmit={() => setAndroidSubmitted(true)} />
+                </Dialog>
+              </motion.div>
+            )}
           </motion.div>
         </motion.div>
 
@@ -1128,10 +1461,14 @@ export default function Home() {
         <div className="absolute bottom-0 left-0 right-0 h-[30vh] z-10 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(249,250,251,0.3) 30%, rgba(249,250,251,0.7) 60%, rgb(249,250,251) 100%)' }} />
       </section>
 
-      {/* Sticky Scroll Features Section */}
-      <StickyFeaturesSection />
+      {/* "Everything you need" App Showcase Section */}
+      <AppShowcaseSection />
 
+      {/* Interactive AI Chat Section */}
+      <FaroAIChat />
 
+      {/* Continuation Carousel of App Screenshots */}
+      <ScreensCarouselSection />
 
       {/* Final CTA Section & Footer Wrapper */}
       <section
@@ -1215,7 +1552,7 @@ export default function Home() {
                 <h3 className="text-2xl md:text-3xl font-medium text-white/40 tracking-tight">
                   Developed for the <br className="hidden md:block" />
                   <span className="text-white font-black">Faro Next Generation 2026</span>{" "}
-                  <span className="text-white/40 font-medium">competition</span>
+                  <span className="text-white/40 font-medium">Hackathon</span>
                 </h3>
               </div>
 
