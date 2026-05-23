@@ -378,27 +378,95 @@ const PreOrderForm = ({
   );
 };
 
+const parseTextToParagraphs = (text: string) => {
+  const lines = text.split("\n");
+  const paragraphs: { text: string; isBold: boolean; globalIndex: number }[][] = [];
+  let globalWordCounter = 0;
+  
+  const punctuationRegex = /^[:,\.!\?;\)]+$/;
+
+  for (const line of lines) {
+    if (!line.trim()) {
+      paragraphs.push([]);
+      continue;
+    }
+
+    const paragraphTokens: { text: string; isBold: boolean }[] = [];
+    const segmentRegex = /(\*\*.*?\*\*|[^\*]+)/g;
+    let match;
+    
+    while ((match = segmentRegex.exec(line)) !== null) {
+      const part = match[0];
+      if (part.startsWith('**') && part.endsWith('**')) {
+        const boldText = part.slice(2, -2);
+        const words = boldText.split(' ');
+        for (const w of words) {
+          if (w) {
+            paragraphTokens.push({ text: w, isBold: true });
+          }
+        }
+      } else {
+        const words = part.split(' ');
+        for (const w of words) {
+          if (w) {
+            paragraphTokens.push({ text: w, isBold: false });
+          }
+        }
+      }
+    }
+    
+    const mergedTokens: { text: string; isBold: boolean; globalIndex: number }[] = [];
+    for (const token of paragraphTokens) {
+      if (mergedTokens.length > 0 && punctuationRegex.test(token.text)) {
+        mergedTokens[mergedTokens.length - 1].text += token.text;
+      } else {
+        mergedTokens.push({
+          text: token.text,
+          isBold: token.isBold,
+          globalIndex: globalWordCounter++
+        });
+      }
+    }
+    
+    paragraphs.push(mergedTokens);
+  }
+  
+  return paragraphs;
+};
+
 // Word-by-word staggered reveal component for a truly premium typography animation
 const TypographicResponse = ({ text }: { text: string }) => {
-  const words = text.split(" ");
+  const paragraphs = parseTextToParagraphs(text);
   return (
-    <p className="text-slate-800 text-lg md:text-2xl font-semibold leading-relaxed font-sans text-center">
-      {words.map((word, idx) => (
-        <motion.span
-          key={idx}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: 0.3,
-            delay: idx * 0.035,
-            ease: [0.16, 1, 0.3, 1]
-          }}
-          className="inline-block mr-1.5"
-        >
-          {word}
-        </motion.span>
-      ))}
-    </p>
+    <div className="space-y-4 md:space-y-6 text-center">
+      {paragraphs.map((paragraph, pIdx) => {
+        if (paragraph.length === 0) {
+          return <div key={pIdx} className="h-2 md:h-3" />;
+        }
+        return (
+          <p
+            key={pIdx}
+            className="text-slate-800 text-lg md:text-2xl font-semibold leading-relaxed font-sans"
+          >
+            {paragraph.map((word) => (
+              <motion.span
+                key={word.globalIndex}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.3,
+                  delay: word.globalIndex * 0.035,
+                  ease: [0.16, 1, 0.3, 1]
+                }}
+                className={`inline-block mr-1.5 ${word.isBold ? 'font-black text-slate-950 bg-sky-100/50 px-1 rounded' : ''}`}
+              >
+                {word.text}
+              </motion.span>
+            ))}
+          </p>
+        );
+      })}
+    </div>
   );
 };
 
