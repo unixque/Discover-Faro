@@ -1672,7 +1672,7 @@ export default function Home() {
                   <span className="text-2xl font-black text-white tracking-tighter">DiscoverFaro</span>
                 </div>
                 <div className="text-xs font-medium tracking-widest uppercase text-white/60">
-                  © 2026 DiscoverFaro.
+                  © 2026 DiscoverFaro. All rights reserved.
                 </div>
               </div>
 
