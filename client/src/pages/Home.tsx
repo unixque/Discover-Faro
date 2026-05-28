@@ -1491,35 +1491,40 @@ export default function Home() {
                 initial={{ opacity: 0, y: 25 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
-                className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-8"
+                className="flex flex-col sm:flex-row gap-8 justify-center items-start pt-8"
               >
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="inline-flex items-center justify-center gap-3 bg-white text-gray-900 font-bold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 w-[240px] h-16 px-6"
-                    >
-                      <img src="/logos/apple.png" alt="Apple" className="h-6 w-6" />
-                      Pre-order iOS
-                    </motion.button>
-                  </DialogTrigger>
-                  <PreOrderForm type="ios" submitted={iosSubmitted} onSubmit={() => setIosSubmitted(true)} />
-                </Dialog>
+                <div className="flex flex-col items-center gap-3 w-[260px]">
+                  <motion.a
+                    href="https://testflight.apple.com/join/5UFaWquX"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="inline-flex items-center justify-center gap-3 bg-white text-gray-900 font-bold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 w-full h-16 px-6"
+                  >
+                    <img src="/logos/apple.png" alt="Apple" className="h-6 w-6" />
+                    Try Now on iOS
+                  </motion.a>
+                  <p className="text-[10px] text-white/50 text-center font-medium leading-relaxed">
+                    * TestFlight Beta version. May contain bugs/instabilities. In-app bug reporting is fully supported. Thanks for your help!
+                  </p>
+                </div>
 
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="inline-flex items-center justify-center gap-3 bg-white text-gray-900 font-bold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 w-[240px] h-16 px-6"
-                    >
-                      <img src="/logos/google-play.png" alt="Google Play" className="h-6 w-6" />
-                      Pre-order Android
-                    </motion.button>
-                  </DialogTrigger>
-                  <PreOrderForm type="android" submitted={androidSubmitted} onSubmit={() => setAndroidSubmitted(true)} />
-                </Dialog>
+                <div className="flex flex-col items-center gap-3 w-[260px]">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="inline-flex items-center justify-center gap-3 bg-white text-gray-900 font-bold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 w-full h-16 px-6"
+                      >
+                        <img src="/logos/google-play.png" alt="Google Play" className="h-6 w-6" />
+                        Pre-order Android
+                      </motion.button>
+                    </DialogTrigger>
+                    <PreOrderForm type="android" submitted={androidSubmitted} onSubmit={() => setAndroidSubmitted(true)} />
+                  </Dialog>
+                </div>
               </motion.div>
             )}
           </motion.div>
@@ -1571,35 +1576,40 @@ export default function Home() {
               Join thousands of early explorers and redefine how you experience Faro. Your journey begins with a single tap.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-8">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <motion.button
-                    whileHover={{ scale: 1.05, y: -5 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="group relative inline-flex items-center justify-center gap-4 bg-white text-gray-900 font-black rounded-2xl shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_60px_rgba(255,255,255,0.4)] transition-all duration-300 w-[280px] h-20 px-8 text-xl"
-                  >
-                    <div className="absolute -inset-0.5 bg-gradient-to-r from-sky-400 to-pink-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
-                    <img src="/logos/apple.png" alt="Apple" className="h-8 w-8 relative z-10" />
-                    <span className="relative z-10">Pre-order iOS</span>
-                  </motion.button>
-                </DialogTrigger>
-                <PreOrderForm type="ios" submitted={iosSubmitted} onSubmit={() => setIosSubmitted(true)} />
-              </Dialog>
+            <div className="flex flex-col sm:flex-row gap-8 justify-center items-start pt-8">
+              <div className="flex flex-col items-center gap-4 w-[280px]">
+                <motion.a
+                  href="https://testflight.apple.com/join/5UFaWquX"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="group relative inline-flex items-center justify-center gap-4 bg-white text-gray-900 font-black rounded-2xl shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_60px_rgba(255,255,255,0.4)] transition-all duration-300 w-full h-20 px-8 text-xl"
+                >
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-sky-400 to-pink-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+                  <img src="/logos/apple.png" alt="Apple" className="h-8 w-8 relative z-10" />
+                  <span className="relative z-10">Try Now on iOS</span>
+                </motion.a>
+                <p className="text-[11px] text-slate-400 text-center font-medium leading-relaxed">
+                  * TestFlight Beta version. May contain bugs/instabilities. In-app bug reporting is fully supported. Thanks for your help!
+                </p>
+              </div>
 
-              <Dialog>
-                <DialogTrigger asChild>
-                  <motion.button
-                    whileHover={{ scale: 1.05, y: -5 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="group relative inline-flex items-center justify-center gap-4 bg-slate-900 text-white font-black rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.4)] border border-white/10 hover:border-white/20 transition-all duration-300 w-[280px] h-20 px-8 text-xl"
-                  >
-                    <img src="/logos/google-play.png" alt="Google Play" className="h-8 w-8" />
-                    <span>Pre-order Android</span>
-                  </motion.button>
-                </DialogTrigger>
-                <PreOrderForm type="android" submitted={androidSubmitted} onSubmit={() => setAndroidSubmitted(true)} />
-              </Dialog>
+              <div className="flex flex-col items-center gap-4 w-[280px]">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <motion.button
+                      whileHover={{ scale: 1.05, y: -5 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="group relative inline-flex items-center justify-center gap-4 bg-slate-900 text-white font-black rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.4)] border border-white/10 hover:border-white/20 transition-all duration-300 w-full h-20 px-8 text-xl"
+                    >
+                      <img src="/logos/google-play.png" alt="Google Play" className="h-8 w-8" />
+                      <span>Pre-order Android</span>
+                    </motion.button>
+                  </DialogTrigger>
+                  <PreOrderForm type="android" submitted={androidSubmitted} onSubmit={() => setAndroidSubmitted(true)} />
+                </Dialog>
+              </div>
             </div>
           </motion.div>
         </div>
@@ -1672,7 +1682,7 @@ export default function Home() {
                   <span className="text-2xl font-black text-white tracking-tighter">DiscoverFaro</span>
                 </div>
                 <div className="text-xs font-medium tracking-widest uppercase text-white/60">
-                  © 2026 DiscoverFaro. All rights reserved.
+                  © 2026 DiscoverFaro.
                 </div>
               </div>
 
